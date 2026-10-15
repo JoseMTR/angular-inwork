@@ -1,0 +1,42 @@
+.titulo-trabajo {
+  display: block;
+  font-weight: 600;
+}
+
+.detalle-trabajo {
+  columns: 2 300px;
+  column-gap: 36px;
+}
+
+.detalle-trabajo > * {
+  break-inside: avoid;
+  margin-bottom: 16px;
+}
+
+.cabecera-detalle {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cabecera-detalle h3 {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.ancho {
+  grid-column: 1 / -1;
+}
+
+.fotos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.fotos .imagen-falsa {
+  height: 76px;
+}

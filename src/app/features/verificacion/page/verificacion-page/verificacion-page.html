@@ -1,0 +1,105 @@
+<div class="pagina">
+  <app-page-header titulo="Verificación de identidad" grupo="Personas" descripcion="Compara el documento con la selfie y confirma que cada persona es quien dice ser."></app-page-header>
+
+  <div class="rejilla c-3">
+    @for (dato of verificacionService.contadores(); track dato.titulo) {
+      <app-stat-card [dato]="dato"></app-stat-card>
+    }
+  </div>
+
+  <div class="rejilla revision">
+    <app-tarjeta titulo="Solicitudes" subtitulo="Ordenadas de la más antigua a la más reciente">
+      <div class="segmentado filtros">
+        @for (filtro of filtros; track filtro) {
+          <button type="button" [class]="filtro === 'Pendientes' ? 'segmento activo' : 'segmento'">{{ filtro }}</button>
+        }
+      </div>
+      <ul class="solicitudes">
+        @for (solicitud of verificacionService.solicitudes(); track solicitud.id_verificacion) {
+          <li [class]="solicitud.id_verificacion === seleccionada.id_verificacion ? 'solicitud activa' : 'solicitud'">
+            <app-avatar [nombre]="solicitud.usuario" tamano="chico"></app-avatar>
+            <span class="solicitud-texto">
+              <strong>{{ solicitud.usuario }}</strong>
+              <small>{{ solicitud.created }}</small>
+            </span>
+            <app-status-pill [estado]="solicitud.estado_verificacion"></app-status-pill>
+          </li>
+        }
+      </ul>
+    </app-tarjeta>
+
+    <app-tarjeta titulo="Revisión" [subtitulo]="'Solicitud #' + seleccionada.id_verificacion + ', enviada ' + seleccionada.created.toLowerCase()">
+      <div class="documentos">
+        <figure class="imagen-falsa">
+          <span class="material-symbols-rounded">badge</span>
+          Documento, frente
+        </figure>
+        <figure class="imagen-falsa">
+          <span class="material-symbols-rounded">flip</span>
+          Documento, reverso
+        </figure>
+        <figure class="imagen-falsa selfie">
+          <span class="material-symbols-rounded">face</span>
+          Selfie
+        </figure>
+      </div>
+
+      <div class="datos">
+        <div class="celda-persona">
+          <app-avatar [nombre]="seleccionada.usuario"></app-avatar>
+          <div>
+            <strong>{{ seleccionada.usuario }}</strong>
+            <small>{{ seleccionada.correo }}</small>
+          </div>
+        </div>
+        <dl class="detalle">
+          <div>
+            <dt>Tipo de documento</dt>
+            <dd>{{ seleccionada.tipo_identificacion }}</dd>
+          </div>
+          <div>
+            <dt>Número</dt>
+            <dd>{{ seleccionada.numero_identificacion }}</dd>
+          </div>
+          <div>
+            <dt>Ciudad</dt>
+            <dd>{{ seleccionada.ciudad }}</dd>
+          </div>
+          <div>
+            <dt>Intentos</dt>
+            <dd>2</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="campo">
+        <label for="observacion">Observación</label>
+        <textarea id="observacion" class="entrada" placeholder="Escribe el motivo si vas a rechazar la solicitud"></textarea>
+        <span class="ayuda">Es obligatoria cuando se rechaza.</span>
+      </div>
+
+      <div class="acciones decision">
+        <button class="boton boton-peligro" type="button">
+          <span class="material-symbols-rounded">close</span>
+          Rechazar
+        </button>
+        <button class="boton boton-primario" type="button">
+          <span class="material-symbols-rounded">check</span>
+          Aprobar identidad
+        </button>
+      </div>
+
+      <div class="separador"></div>
+
+      <span class="subtitulo-seccion">Historial de este usuario</span>
+      <ul class="linea-tiempo">
+        @for (registro of verificacionService.historial(); track registro.fecha) {
+          <li [class]="registro.estado === 'pendiente' ? 'actual' : ''">
+            <strong>{{ registro.fecha }}, {{ registro.estado }}</strong>
+            <small>{{ registro.observacion }}</small>
+          </li>
+        }
+      </ul>
+    </app-tarjeta>
+  </div>
+</div>

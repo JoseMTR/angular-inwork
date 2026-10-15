@@ -1,0 +1,16 @@
+<article class="stat vidrio">
+  <div class="stat-cabecera">
+    <span class="stat-titulo">{{ dato.titulo }}</span>
+    <span [class]="'stat-icono tono-' + dato.color">
+      <span class="material-symbols-rounded">{{ dato.icono }}</span>
+    </span>
+  </div>
+  <strong class="stat-valor numero">{{ dato.valor }}</strong>
+  <div class="stat-pie">
+    <span [class]="dato.sube ? 'variacion' : 'variacion baja'">
+      <span class="material-symbols-rounded">{{ dato.sube ? 'trending_up' : 'trending_down' }}</span>
+      {{ dato.variacion }}
+    </span>
+    <span class="stat-detalle">{{ dato.detalle }}</span>
+  </div>
+</article>

@@ -1,0 +1,60 @@
+<div class="pagina">
+  <app-page-header titulo="Mapa de trabajos" grupo="Marketplace" descripcion="Dónde se concentra la demanda. Cada punto es un trabajo publicado."></app-page-header>
+
+  <app-filter-bar placeholder="Buscar un barrio o una dirección" [filtros]="['Categoría', 'Estado', 'Ciudad']"></app-filter-bar>
+
+  <div class="rejilla c-lateral">
+    <section class="mapa vidrio">
+      <div class="lienzo">
+        <span class="zona zona-a"></span>
+        <span class="zona zona-b"></span>
+        <span class="zona zona-c"></span>
+        <span class="rio"></span>
+        @for (marcador of mapaService.marcadores(); track marcador.id_trabajo) {
+          <span [class]="marcador.id_trabajo === seleccionado.id_trabajo ? 'pin elegido' : 'pin'"
+                [class.asignado]="marcador.estado === 'asignado'"
+                [style.left.%]="marcador.x" [style.top.%]="marcador.y">
+            <span class="material-symbols-rounded">location_on</span>
+          </span>
+        }
+        <div class="emergente" [style.left.%]="seleccionado.x" [style.top.%]="seleccionado.y">
+          <strong>{{ seleccionado.titulo }}</strong>
+          <span class="texto-3 texto-chico">{{ seleccionado.categoria }}, {{ seleccionado.presupuesto | moneda }}</span>
+          <div class="emergente-pie">
+            <app-status-pill [estado]="seleccionado.estado"></app-status-pill>
+            <a class="ver" routerLink="/admin/trabajos">Abrir trabajo</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="controles">
+        <button class="boton boton-claro boton-icono" type="button" aria-label="Acercar">
+          <span class="material-symbols-rounded">add</span>
+        </button>
+        <button class="boton boton-claro boton-icono" type="button" aria-label="Alejar">
+          <span class="material-symbols-rounded">remove</span>
+        </button>
+      </div>
+
+      <div class="leyenda vidrio">
+        <span><i class="punto publicado"></i>Publicado</span>
+        <span><i class="punto asignado"></i>Asignado</span>
+      </div>
+    </section>
+
+    <app-tarjeta titulo="Trabajos por ciudad" subtitulo="Publicados y asignados">
+      <ul class="lista">
+        @for (ciudad of mapaService.ciudades(); track ciudad.ciudad) {
+          <li>
+            <span class="ciudad">
+              <span class="material-symbols-rounded">location_city</span>
+              {{ ciudad.ciudad }}
+            </span>
+            <strong class="numero">{{ ciudad.total }}</strong>
+          </li>
+        }
+      </ul>
+      <p class="nota-mapa">El mapa real se dibujará con Leaflet usando la latitud y longitud de cada trabajo.</p>
+    </app-tarjeta>
+  </div>
+</div>

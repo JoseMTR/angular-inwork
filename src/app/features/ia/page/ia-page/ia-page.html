@@ -1,0 +1,180 @@
+<div class="pagina">
+  <app-page-header titulo="IA" grupo="General" descripcion="Pregunta en lenguaje natural y la IA arma el informe o el dashboard por ti.">
+    <button class="boton boton-claro" type="button">
+      <span class="material-symbols-rounded">history</span>
+      Ver todo el historial
+    </button>
+  </app-page-header>
+
+  <div class="espacio">
+    <aside class="historial vidrio">
+      <button class="boton boton-primario boton-bloque" type="button">
+        <span class="material-symbols-rounded">add</span>
+        Nueva conversación
+      </button>
+      <ul class="conversaciones">
+        @for (conversacion of iaService.conversaciones(); track conversacion.id) {
+          <li [class]="conversacion.id === conversacionActiva ? 'conversacion activa' : 'conversacion'">
+            <span class="material-symbols-rounded">chat_bubble</span>
+            <span class="conversacion-texto">
+              <strong>{{ conversacion.titulo }}</strong>
+              <small>{{ conversacion.fecha }}</small>
+            </span>
+          </li>
+        }
+      </ul>
+    </aside>
+
+    <section class="chat vidrio">
+      <header class="chat-cabecera">
+        <div>
+          <h2>Ingresos de octubre vs. septiembre</h2>
+          <small>Datos actualizados hoy a las 8:40 a. m.</small>
+        </div>
+        <span class="chip">
+          <span class="material-symbols-rounded">lock</span>
+          Solo lectura de la base de datos
+        </span>
+      </header>
+
+      <div class="mensajes">
+        <app-chat-bubble autor="Tú" hora="8:41 a. m." [propio]="true">
+          Compara los ingresos de octubre con los de septiembre y dime qué categorías crecieron más.
+        </app-chat-bubble>
+
+        <app-chat-bubble autor="Asistente InWork" hora="8:41 a. m." [ia]="true">
+          <p class="respuesta">
+            En octubre la comisión llegó a <strong>$ 48,9 M</strong>, un 35,8% más que en septiembre.
+            El crecimiento viene sobre todo de <strong>Hogar</strong> y <strong>Mudanzas</strong>, que juntas suman el 49% del aumento.
+          </p>
+
+          <div class="rejilla c-3 cifras">
+            <div class="dato-mini">
+              <span>Octubre</span>
+              <strong>$ 48,9 M</strong>
+            </div>
+            <div class="dato-mini">
+              <span>Septiembre</span>
+              <strong>$ 36,0 M</strong>
+            </div>
+            <div class="dato-mini">
+              <span>Variación</span>
+              <strong class="positivo">+35,8%</strong>
+            </div>
+          </div>
+
+          <div class="bloque">
+            <span class="subtitulo-seccion">Crecimiento por categoría (%)</span>
+            <app-grafico-barras [barras]="iaService.crecimiento()" [horizontal]="true" color="verde"></app-grafico-barras>
+          </div>
+
+          <div class="tabla-contenedor bloque">
+            <table class="tabla">
+              <thead>
+                <tr>
+                  <th>Categoría</th>
+                  <th>Septiembre</th>
+                  <th>Octubre</th>
+                  <th>Cambio</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (fila of iaService.comparacion(); track fila.categoria) {
+                  <tr>
+                    <td class="fuerte">{{ fila.categoria }}</td>
+                    <td class="numero">{{ fila.anterior | moneda }}</td>
+                    <td class="numero">{{ fila.actual | moneda }}</td>
+                    <td class="positivo fuerte">{{ fila.cambio }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="acciones bloque">
+            <button class="boton boton-claro boton-pequeno" type="button">
+              <span class="material-symbols-rounded">push_pin</span>
+              Fijar al dashboard
+            </button>
+            <button class="boton boton-claro boton-pequeno" type="button">
+              <span class="material-symbols-rounded">bookmark_add</span>
+              Guardar como informe
+            </button>
+            <button class="boton boton-claro boton-pequeno" type="button">
+              <span class="material-symbols-rounded">picture_as_pdf</span>
+              PDF
+            </button>
+            <button class="boton boton-claro boton-pequeno" type="button">
+              <span class="material-symbols-rounded">table_view</span>
+              Excel
+            </button>
+            <button class="boton boton-claro boton-pequeno" type="button">
+              <span class="material-symbols-rounded">refresh</span>
+              Regenerar
+            </button>
+          </div>
+        </app-chat-bubble>
+      </div>
+
+      <div class="sugerencias">
+        @for (sugerencia of iaService.sugerencias(); track sugerencia) {
+          <button class="chip sugerencia" type="button">
+            <span class="material-symbols-rounded">auto_awesome</span>
+            {{ sugerencia }}
+          </button>
+        }
+      </div>
+
+      <form class="escribir">
+        <button class="boton boton-claro boton-icono" type="button" aria-label="Adjuntar">
+          <span class="material-symbols-rounded">attach_file</span>
+        </button>
+        <input class="entrada" type="text" placeholder="Pregunta algo sobre los datos de InWork">
+        <button class="boton boton-primario boton-icono" type="button" aria-label="Enviar">
+          <span class="material-symbols-rounded">send</span>
+        </button>
+      </form>
+    </section>
+
+    <aside class="vista vidrio">
+      <div class="vista-cabecera">
+        <span class="material-symbols-rounded">preview</span>
+        <h3>Vista previa</h3>
+      </div>
+      <div class="documento">
+        <span class="texto-3 texto-chico">Informe generado</span>
+        <h4>Ingresos de octubre</h4>
+        <div class="vista-cifras">
+          <div>
+            <span>Comisión</span>
+            <strong>$ 48,9 M</strong>
+          </div>
+          <div>
+            <span>Variación</span>
+            <strong class="positivo">+35,8%</strong>
+          </div>
+        </div>
+        <div class="imagen-falsa grafico-previo">
+          <span class="material-symbols-rounded">bar_chart</span>
+          Gráfico por categoría
+        </div>
+        <ul class="secciones">
+          <li><span class="material-symbols-rounded">check_circle</span>Resumen</li>
+          <li><span class="material-symbols-rounded">check_circle</span>Cifras clave</li>
+          <li><span class="material-symbols-rounded">check_circle</span>Comparación por categoría</li>
+          <li class="pendiente"><span class="material-symbols-rounded">radio_button_unchecked</span>Recomendaciones</li>
+        </ul>
+      </div>
+      <div class="acciones">
+        <button class="boton boton-primario boton-bloque" type="button">
+          <span class="material-symbols-rounded">save</span>
+          Guardar informe
+        </button>
+        <button class="boton boton-claro boton-bloque" type="button">
+          <span class="material-symbols-rounded">dashboard_customize</span>
+          Abrir como dashboard
+        </button>
+      </div>
+    </aside>
+  </div>
+</div>

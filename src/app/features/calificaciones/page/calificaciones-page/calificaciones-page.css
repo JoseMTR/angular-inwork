@@ -1,0 +1,22 @@
+.lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.comentario {
+  max-width: 280px;
+}
+
+.promedio-bajo {
+  display: inline-grid;
+  place-items: center;
+  min-width: 42px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 9px;
+  font-weight: 800;
+  color: var(--rojo);
+  background: var(--rojo-suave);
+}

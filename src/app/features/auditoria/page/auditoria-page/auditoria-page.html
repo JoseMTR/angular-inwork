@@ -1,0 +1,84 @@
+<div class="pagina">
+  <app-page-header titulo="Auditoría" grupo="Sistema" descripcion="Quién hizo qué y cuándo dentro de la plataforma."></app-page-header>
+
+  <app-filter-bar placeholder="Buscar por usuario, tabla o registro" [filtros]="['Usuario', 'Tabla', 'Acción', 'Rango de fechas']">
+    <button class="boton boton-claro" type="button">
+      <span class="material-symbols-rounded">download</span>
+      Exportar
+    </button>
+  </app-filter-bar>
+
+  <div class="rejilla">
+    <app-tarjeta titulo="Eventos" subtitulo="88.213 registrados">
+      <div class="tabla-contenedor">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Usuario</th>
+              <th>Tabla</th>
+              <th>Acción</th>
+              <th>Registro</th>
+              <th>IP</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (evento of auditoriaService.eventos(); track evento.id_auditoria) {
+              <tr [class.seleccionada]="evento.id_auditoria === seleccionado.id_auditoria">
+                <td class="texto-2 fecha">{{ evento.created }}</td>
+                <td>
+                  <div class="celda-persona">
+                    <app-avatar [nombre]="evento.usuario" tamano="chico"></app-avatar>
+                    <strong>{{ evento.usuario }}</strong>
+                  </div>
+                </td>
+                <td><code>{{ evento.tabla }}</code></td>
+                <td><app-status-pill [estado]="evento.accion"></app-status-pill></td>
+                <td class="numero">#{{ evento.id_registro }}</td>
+                <td class="texto-3 numero">{{ evento.ip }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-tarjeta>
+
+    <app-tarjeta [titulo]="'Evento #' + seleccionado.id_auditoria" [subtitulo]="seleccionado.accion + ' en ' + seleccionado.tabla + ', registro #' + seleccionado.id_registro">
+      <div class="evento">
+        <dl class="detalle">
+          <div>
+            <dt>Usuario</dt>
+            <dd>{{ seleccionado.usuario }}</dd>
+          </div>
+          <div>
+            <dt>IP</dt>
+            <dd>{{ seleccionado.ip }}</dd>
+          </div>
+          <div class="ancho">
+            <dt>Fecha</dt>
+            <dd>{{ seleccionado.created }}</dd>
+          </div>
+        </dl>
+
+        <div>
+          <span class="subtitulo-seccion">Datos anteriores y nuevos</span>
+          <div class="comparacion">
+            <div class="fila cabecera">
+              <span>Campo</span>
+              <span>Antes</span>
+              <span>Después</span>
+            </div>
+            @for (cambio of auditoriaService.cambios(); track cambio.campo) {
+              <div [class]="cambio.antes !== cambio.despues ? 'fila cambiada' : 'fila'">
+                <code>{{ cambio.campo }}</code>
+                <span class="antes">{{ cambio.antes }}</span>
+                <span class="despues">{{ cambio.despues }}</span>
+              </div>
+            }
+          </div>
+          <p class="texto-3 texto-chico nota">Los campos resaltados cambiaron. En la base de datos se guardan como JSON.</p>
+        </div>
+      </div>
+    </app-tarjeta>
+  </div>
+</div>

@@ -1,0 +1,92 @@
+<div class="pagina">
+  <app-page-header titulo="Perfil" grupo="Sistema" descripcion="Los datos de la cuenta con la que iniciaste sesión."></app-page-header>
+
+  <div class="rejilla perfil">
+    <section class="tarjeta-perfil vidrio">
+      <div class="portada"></div>
+      <div class="identidad">
+        <app-avatar [nombre]="sesionService.usuario().nombre" tamano="grande"></app-avatar>
+        <h2>{{ sesionService.usuario().nombre }}</h2>
+        <span class="texto-2">{{ sesionService.usuario().correo }}</span>
+        <span class="rol">
+          <span class="material-symbols-rounded">admin_panel_settings</span>
+          {{ sesionService.usuario().rol }}
+        </span>
+      </div>
+      <ul class="lista">
+        <li>
+          <span class="texto-3">Teléfono</span>
+          <strong>{{ sesionService.usuario().telefono }}</strong>
+        </li>
+        <li>
+          <span class="texto-3">Ciudad</span>
+          <strong>{{ sesionService.usuario().ciudad }}</strong>
+        </li>
+        <li>
+          <span class="texto-3">Última sesión</span>
+          <strong>{{ sesionService.usuario().ultima_sesion }}</strong>
+        </li>
+      </ul>
+      <a class="boton boton-peligro boton-bloque" routerLink="/login">
+        <span class="material-symbols-rounded">logout</span>
+        Cerrar sesión
+      </a>
+    </section>
+
+    <div class="formularios">
+      <app-tarjeta titulo="Datos personales" subtitulo="El rol solo lo puede cambiar otro administrador">
+        <form class="rejilla c-2 formulario">
+          <div class="campo">
+            <label for="nombre">Nombre completo</label>
+            <input id="nombre" class="entrada" type="text" [value]="sesionService.usuario().nombre">
+          </div>
+          <div class="campo">
+            <label for="correo">Correo</label>
+            <input id="correo" class="entrada" type="email" [value]="sesionService.usuario().correo">
+          </div>
+          <div class="campo">
+            <label for="telefono">Teléfono</label>
+            <input id="telefono" class="entrada" type="tel" [value]="sesionService.usuario().telefono">
+          </div>
+          <div class="campo">
+            <label for="ciudad">Ciudad</label>
+            <input id="ciudad" class="entrada" type="text" [value]="sesionService.usuario().ciudad">
+          </div>
+          <div class="campo">
+            <label for="rol">Rol</label>
+            <input id="rol" class="entrada" type="text" [value]="sesionService.usuario().rol" disabled>
+          </div>
+          <div class="guardar">
+            <button class="boton boton-primario" type="button">
+              <span class="material-symbols-rounded">save</span>
+              Guardar cambios
+            </button>
+          </div>
+        </form>
+      </app-tarjeta>
+
+      <app-tarjeta titulo="Cambiar contraseña" subtitulo="Al cambiarla se cierran tus otras sesiones">
+        <form class="rejilla c-3 formulario">
+          <div class="campo">
+            <label for="actual">Contraseña actual</label>
+            <input id="actual" class="entrada" type="password" placeholder="••••••••">
+          </div>
+          <div class="campo">
+            <label for="nueva">Nueva contraseña</label>
+            <input id="nueva" class="entrada" type="password" placeholder="Mínimo 8 caracteres">
+          </div>
+          <div class="campo">
+            <label for="confirmar">Confirmar</label>
+            <input id="confirmar" class="entrada" type="password" placeholder="Repite la nueva">
+          </div>
+        </form>
+        <div class="guardar fin">
+          <button class="boton boton-claro" type="button">
+            <span class="material-symbols-rounded">key</span>
+            Actualizar contraseña
+          </button>
+        </div>
+      </app-tarjeta>
+    </div>
+  </div>
+</div>

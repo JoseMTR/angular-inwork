@@ -1,0 +1,90 @@
+<div class="pagina">
+  <app-page-header titulo="Roles y permisos" grupo="Sistema" descripcion="Decide qué puede hacer cada rol en cada módulo del panel.">
+    <button class="boton boton-claro" type="button">Descartar</button>
+    <button class="boton boton-primario" type="button">
+      <span class="material-symbols-rounded">save</span>
+      Guardar cambios
+    </button>
+  </app-page-header>
+
+  <div class="rejilla c-3">
+    @for (rol of rolesService.roles(); track rol.id_rol) {
+      <article [class]="rol.nombre === rolSeleccionado ? 'rol vidrio elegido' : 'rol vidrio'">
+        <span class="rol-icono">
+          <span class="material-symbols-rounded">{{ rol.icono }}</span>
+        </span>
+        <div class="rol-texto">
+          <h3>{{ rol.nombre }}</h3>
+          <small>{{ rol.descripcion }}</small>
+        </div>
+        <span class="usuarios">
+          <strong>{{ rol.usuarios }}</strong>
+          usuarios
+        </span>
+      </article>
+    }
+  </div>
+
+  <div class="rejilla c-lateral">
+    <app-tarjeta [titulo]="'Permisos de ' + rolSeleccionado" subtitulo="Cada interruptor corresponde a una acción sobre el módulo">
+      <div class="tabla-contenedor">
+        <table class="tabla matriz">
+          <thead>
+            <tr>
+              <th>Módulo</th>
+              <th>Crear</th>
+              <th>Leer</th>
+              <th>Editar</th>
+              <th>Eliminar</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (permiso of rolesService.permisos(); track permiso.modulo) {
+              <tr>
+                <td class="fuerte">{{ permiso.modulo }}</td>
+                <td>
+                  <label class="interruptor">
+                    <input type="checkbox" [checked]="permiso.puede_crear" [attr.aria-label]="'Crear en ' + permiso.modulo">
+                    <span></span>
+                  </label>
+                </td>
+                <td>
+                  <label class="interruptor">
+                    <input type="checkbox" [checked]="permiso.puede_leer" [attr.aria-label]="'Leer en ' + permiso.modulo">
+                    <span></span>
+                  </label>
+                </td>
+                <td>
+                  <label class="interruptor">
+                    <input type="checkbox" [checked]="permiso.puede_editar" [attr.aria-label]="'Editar en ' + permiso.modulo">
+                    <span></span>
+                  </label>
+                </td>
+                <td>
+                  <label class="interruptor">
+                    <input type="checkbox" [checked]="permiso.puede_eliminar" [attr.aria-label]="'Eliminar en ' + permiso.modulo">
+                    <span></span>
+                  </label>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-tarjeta>
+
+    <app-tarjeta titulo="Lo que verá este rol" subtitulo="Menú con la configuración actual">
+      <ul class="lista">
+        @for (item of rolesService.menu(); track item.texto) {
+          <li [class]="'acceso-' + item.acceso">
+            <span class="item-menu">
+              <span class="material-symbols-rounded">{{ item.acceso === 'ninguno' ? 'visibility_off' : 'visibility' }}</span>
+              {{ item.texto }}
+            </span>
+            <small>{{ item.acceso === 'lectura' ? 'Solo lectura' : item.acceso === 'ninguno' ? 'Sin acceso' : 'Completo' }}</small>
+          </li>
+        }
+      </ul>
+    </app-tarjeta>
+  </div>
+</div>

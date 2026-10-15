@@ -1,0 +1,113 @@
+<div class="pagina">
+  <app-page-header titulo="Dashboard" grupo="General" descripcion="Así va InWork en los últimos 30 días.">
+    <button class="boton boton-claro" type="button">
+      <span class="material-symbols-rounded">download</span>
+      Exportar
+    </button>
+    <button class="boton boton-suave" type="button">
+      <span class="material-symbols-rounded">auto_awesome</span>
+      Explicar con IA
+    </button>
+  </app-page-header>
+
+  <div class="rejilla c-5">
+    @for (metrica of dashboardService.metricas(); track metrica.titulo) {
+      <app-stat-card [dato]="metrica"></app-stat-card>
+    }
+  </div>
+
+  <div class="rejilla c-ancha">
+    <app-tarjeta titulo="Evolución" subtitulo="Ingresos por comisión de los últimos 12 meses, en millones de pesos">
+      <div acciones class="segmentado">
+        @for (serie of series; track serie) {
+          <button type="button" [class]="serie === 'Ingresos' ? 'segmento activo' : 'segmento'">{{ serie }}</button>
+        }
+      </div>
+      <app-grafico-area [valores]="dashboardService.ingresos()" [etiquetas]="dashboardService.meses()"></app-grafico-area>
+    </app-tarjeta>
+
+    <app-tarjeta titulo="Trabajos por estado" subtitulo="3.418 trabajos este mes">
+      <app-grafico-dona [segmentos]="dashboardService.trabajosPorEstado()" textoCentral="publicados"></app-grafico-dona>
+    </app-tarjeta>
+  </div>
+
+  <div class="rejilla c-3">
+    <app-tarjeta titulo="Categorías más solicitadas" subtitulo="Trabajos publicados por categoría">
+      <app-grafico-barras [barras]="dashboardService.categorias()" [horizontal]="true"></app-grafico-barras>
+    </app-tarjeta>
+
+    <app-tarjeta titulo="Mejores trabajadores" subtitulo="Top 5 por calificación">
+      <ul class="lista">
+        @for (trabajador of dashboardService.mejoresTrabajadores(); track trabajador.nombre; let i = $index) {
+          <li>
+            <div class="celda-persona">
+              <span class="puesto">{{ i + 1 }}</span>
+              <app-avatar [nombre]="trabajador.nombre" tamano="chico"></app-avatar>
+              <div>
+                <strong>{{ trabajador.nombre }}</strong>
+                <small>{{ trabajador.oficio }}, {{ trabajador.trabajos }} trabajos</small>
+              </div>
+            </div>
+            <span class="nota-estrella">
+              <span class="material-symbols-rounded">star</span>
+              {{ trabajador.calificacion }}
+            </span>
+          </li>
+        }
+      </ul>
+    </app-tarjeta>
+
+    <app-tarjeta titulo="Alertas" subtitulo="Lo que necesita atención hoy">
+      <div class="alertas">
+        @for (alerta of dashboardService.alertas(); track alerta.titulo) {
+          <a [class]="'alerta alerta-' + alerta.tono" [routerLink]="alerta.ruta">
+            <span class="alerta-icono">
+              <span class="material-symbols-rounded">{{ alerta.icono }}</span>
+            </span>
+            <span class="alerta-texto">
+              <strong>{{ alerta.titulo }}</strong>
+              <small>{{ alerta.detalle }}</small>
+            </span>
+            <span class="material-symbols-rounded flecha">chevron_right</span>
+          </a>
+        }
+      </div>
+    </app-tarjeta>
+  </div>
+
+  <app-tarjeta titulo="Actividad reciente" subtitulo="Últimos movimientos en la plataforma">
+    <a acciones class="boton boton-claro boton-pequeno" routerLink="/admin/auditoria">Ver auditoría</a>
+    <div class="tabla-contenedor">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Acción</th>
+            <th>Módulo</th>
+            <th>Estado</th>
+            <th>Hora</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (fila of dashboardService.actividad(); track fila.usuario) {
+            <tr>
+              <td>
+                <div class="celda-persona">
+                  <app-avatar [nombre]="fila.usuario" tamano="chico"></app-avatar>
+                  <div>
+                    <strong>{{ fila.usuario }}</strong>
+                    <small>{{ fila.correo }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>{{ fila.accion }}</td>
+              <td class="texto-2">{{ fila.modulo }}</td>
+              <td><app-status-pill [estado]="fila.estado"></app-status-pill></td>
+              <td class="texto-3 fecha">{{ fila.hora }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </app-tarjeta>
+</div>

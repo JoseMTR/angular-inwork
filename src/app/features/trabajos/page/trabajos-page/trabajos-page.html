@@ -1,0 +1,139 @@
+<div class="pagina">
+  <app-page-header titulo="Trabajos" grupo="Marketplace" descripcion="Todo lo que los clientes publican para que otras personas lo hagan."></app-page-header>
+
+  <div class="rejilla c-4">
+    @for (dato of trabajosService.resumen(); track dato.titulo) {
+      <app-stat-card [dato]="dato"></app-stat-card>
+    }
+  </div>
+
+  <app-filter-bar placeholder="Buscar por título o cliente" [filtros]="['Estado', 'Categoría', 'Ciudad', 'Ordenar por']"></app-filter-bar>
+
+  <div class="rejilla">
+    <app-tarjeta titulo="Trabajos publicados" subtitulo="21.506 en total">
+      <div class="tabla-contenedor">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Trabajo</th>
+              <th>Cliente</th>
+              <th>Categoría</th>
+              <th>Ciudad</th>
+              <th>Fecha</th>
+              <th>Presupuesto</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (trabajo of trabajosService.trabajos(); track trabajo.id_trabajo) {
+              <tr [class.seleccionada]="trabajo.id_trabajo === seleccionado.id_trabajo">
+                <td>
+                  <strong class="titulo-trabajo">{{ trabajo.titulo }}</strong>
+                  <small class="texto-3">#{{ trabajo.id_trabajo }}, {{ trabajo.total_ofertas }} ofertas</small>
+                </td>
+                <td>{{ trabajo.cliente }}</td>
+                <td><span class="chip">{{ trabajo.categoria }}</span></td>
+                <td>{{ trabajo.ciudad }}</td>
+                <td class="texto-2 fecha">{{ trabajo.fecha_trabajo }}</td>
+                <td class="numero fuerte">{{ trabajo.presupuesto | moneda }}</td>
+                <td><app-status-pill [estado]="trabajo.estado_trabajo"></app-status-pill></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="paginacion">
+        <span>Mostrando 1 a 6 de 21.506</span>
+        <div class="paginas">
+          <span class="activa">1</span>
+          <span>2</span>
+          <span>3</span>
+        </div>
+      </div>
+    </app-tarjeta>
+
+    <app-tarjeta titulo="Detalle del trabajo" [subtitulo]="'#' + seleccionado.id_trabajo">
+      <div class="detalle-trabajo">
+        <div class="cabecera-detalle">
+          <h3>{{ seleccionado.titulo }}</h3>
+          <app-status-pill [estado]="seleccionado.estado_trabajo"></app-status-pill>
+        </div>
+        <p class="texto-2">{{ seleccionado.descripcion }}</p>
+
+        <dl class="detalle">
+          <div>
+            <dt>Cliente</dt>
+            <dd>{{ seleccionado.cliente }}</dd>
+          </div>
+          <div>
+            <dt>Presupuesto</dt>
+            <dd>{{ seleccionado.presupuesto | moneda }}</dd>
+          </div>
+          <div>
+            <dt>Fecha</dt>
+            <dd>{{ seleccionado.fecha_trabajo }}</dd>
+          </div>
+          <div>
+            <dt>Horario</dt>
+            <dd>{{ seleccionado.hora_inicio }} a {{ seleccionado.hora_fin }}</dd>
+          </div>
+          <div class="ancho">
+            <dt>Dirección</dt>
+            <dd>{{ seleccionado.direccion }}, {{ seleccionado.ciudad }}</dd>
+          </div>
+        </dl>
+
+        <div>
+          <span class="subtitulo-seccion">Habilidades requeridas</span>
+          <div class="fila-chips">
+            @for (habilidad of trabajosService.habilidades(); track habilidad) {
+              <span class="chip">{{ habilidad }}</span>
+            }
+          </div>
+        </div>
+
+        <div>
+          <span class="subtitulo-seccion">Fotos adjuntas</span>
+          <div class="fotos">
+            <div class="imagen-falsa"><span class="material-symbols-rounded">image</span></div>
+            <div class="imagen-falsa"><span class="material-symbols-rounded">image</span></div>
+            <div class="imagen-falsa"><span class="material-symbols-rounded">image</span></div>
+          </div>
+        </div>
+
+        <div>
+          <span class="subtitulo-seccion">Ofertas recibidas</span>
+          <ul class="lista">
+            @for (oferta of trabajosService.ofertasRecibidas(); track oferta.trabajador) {
+              <li>
+                <div class="celda-persona">
+                  <app-avatar [nombre]="oferta.trabajador" tamano="chico"></app-avatar>
+                  <div>
+                    <strong>{{ oferta.trabajador }}</strong>
+                    <small>{{ oferta.valor | moneda }}</small>
+                  </div>
+                </div>
+                <app-status-pill [estado]="oferta.estado"></app-status-pill>
+              </li>
+            }
+          </ul>
+        </div>
+
+        <div class="acciones">
+          <a class="boton boton-claro boton-pequeno" routerLink="/admin/ofertas">
+            <span class="material-symbols-rounded">local_offer</span>
+            Ver ofertas
+          </a>
+          <a class="boton boton-suave boton-pequeno" routerLink="/admin/contrataciones">
+            <span class="material-symbols-rounded">handshake</span>
+            Ver contratación
+          </a>
+          <a class="boton boton-claro boton-pequeno" routerLink="/admin/mapa">
+            <span class="material-symbols-rounded">location_on</span>
+            Ver en el mapa
+          </a>
+        </div>
+      </div>
+    </app-tarjeta>
+  </div>
+</div>

@@ -1,0 +1,72 @@
+code {
+  justify-self: start;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 12px;
+  padding: 2px 7px;
+  border-radius: 7px;
+  background: rgba(24, 32, 47, 0.06);
+  color: var(--texto);
+}
+
+.evento {
+  columns: 2 300px;
+  column-gap: 36px;
+}
+
+.evento > * {
+  break-inside: avoid;
+  margin-bottom: 18px;
+}
+
+.ancho {
+  grid-column: 1 / -1;
+}
+
+.comparacion {
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--linea);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: 0.8fr 1fr 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--linea);
+  font-size: 12.5px;
+  word-break: break-word;
+}
+
+.fila:last-child {
+  border-bottom: 0;
+}
+
+.fila.cabecera {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--texto-3);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.fila.cambiada .antes {
+  color: var(--rojo);
+  text-decoration: line-through;
+}
+
+.fila.cambiada .despues {
+  color: var(--verde);
+  font-weight: 700;
+}
+
+.fila.cambiada {
+  background: rgba(242, 84, 27, 0.05);
+}
+
+.nota {
+  margin-top: 8px;
+}

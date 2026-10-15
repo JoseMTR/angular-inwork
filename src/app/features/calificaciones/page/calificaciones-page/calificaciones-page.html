@@ -1,0 +1,77 @@
+<div class="pagina">
+  <app-page-header titulo="Calificaciones" grupo="Personas" descripcion="Lo que opinan clientes y trabajadores entre sí después de cada trabajo."></app-page-header>
+
+  <div class="rejilla c-3">
+    @for (dato of calificacionesService.resumen(); track dato.titulo) {
+      <app-stat-card [dato]="dato"></app-stat-card>
+    }
+  </div>
+
+  <app-filter-bar placeholder="Buscar por usuario o trabajo" [filtros]="['Puntuación', 'Fecha', 'Usuario']"></app-filter-bar>
+
+  <div class="rejilla c-ancha">
+    <app-tarjeta titulo="Reseñas" subtitulo="Las más recientes primero">
+      <div class="tabla-contenedor">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Calificador</th>
+              <th>Calificado</th>
+              <th>Puntuación</th>
+              <th>Comentario</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (resena of calificacionesService.calificaciones(); track resena.id_calificacion) {
+              <tr>
+                <td>
+                  <div class="celda-persona">
+                    <app-avatar [nombre]="resena.calificador" tamano="chico"></app-avatar>
+                    <div>
+                      <strong>{{ resena.calificador }}</strong>
+                      <small>{{ resena.trabajo }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td class="fuerte">{{ resena.calificado }}</td>
+                <td>
+                  <span class="estrellas" [attr.aria-label]="resena.puntuacion + ' de 5 estrellas'">
+                    @for (numero of estrellas; track numero) {
+                      <span class="material-symbols-rounded" [class.apagada]="numero > resena.puntuacion">star</span>
+                    }
+                  </span>
+                </td>
+                <td class="texto-2 comentario">{{ resena.comentario }}</td>
+                <td class="texto-3 fecha">{{ resena.created }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-tarjeta>
+
+    <div class="lateral">
+      <app-tarjeta titulo="Distribución por estrellas" subtitulo="18.940 reseñas">
+        <app-grafico-barras [barras]="calificacionesService.distribucion()" [horizontal]="true" color="ambar"></app-grafico-barras>
+      </app-tarjeta>
+
+      <app-tarjeta titulo="Usuarios a vigilar" subtitulo="Peor reputación con más de 5 reseñas">
+        <ul class="lista">
+          @for (usuario of calificacionesService.vigilados(); track usuario.nombre) {
+            <li>
+              <div class="celda-persona">
+                <app-avatar [nombre]="usuario.nombre" tamano="chico"></app-avatar>
+                <div>
+                  <strong>{{ usuario.nombre }}</strong>
+                  <small>{{ usuario.resenas }} reseñas, {{ usuario.reportes }} reportes</small>
+                </div>
+              </div>
+              <span class="promedio-bajo">{{ usuario.promedio }}</span>
+            </li>
+          }
+        </ul>
+      </app-tarjeta>
+    </div>
+  </div>
+</div>

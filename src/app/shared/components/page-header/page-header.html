@@ -1,0 +1,20 @@
+<header class="encabezado">
+  <div class="encabezado-texto">
+    <nav class="migas" aria-label="Ubicación">
+      <span>Panel</span>
+      @if (grupo) {
+        <span class="material-symbols-rounded">chevron_right</span>
+        <span>{{ grupo }}</span>
+      }
+      <span class="material-symbols-rounded">chevron_right</span>
+      <span class="actual">{{ titulo }}</span>
+    </nav>
+    <h1>{{ titulo }}</h1>
+    @if (descripcion) {
+      <p>{{ descripcion }}</p>
+    }
+  </div>
+  <div class="encabezado-acciones">
+    <ng-content></ng-content>
+  </div>
+</header>

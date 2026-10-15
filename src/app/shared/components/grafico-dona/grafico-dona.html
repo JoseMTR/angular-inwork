@@ -1,0 +1,18 @@
+<div class="dona-contenedor">
+  <div class="dona" [style.background]="fondo">
+    <div class="centro">
+      <strong>{{ porcentaje(segmentos[0]) }}%</strong>
+      <span>{{ textoCentral }}</span>
+    </div>
+  </div>
+  <ul class="leyenda">
+    @for (segmento of segmentos; track segmento.nombre) {
+      <li>
+        <span class="color" [style.background]="segmento.color"></span>
+        <span class="nombre">{{ segmento.nombre }}</span>
+        <strong>{{ porcentaje(segmento) }}%</strong>
+        <span class="valor">({{ segmento.valor }})</span>
+      </li>
+    }
+  </ul>
+</div>

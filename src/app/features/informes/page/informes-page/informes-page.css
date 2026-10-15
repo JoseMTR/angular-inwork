@@ -1,0 +1,142 @@
+.columna {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.informe {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 22px;
+}
+
+.informe.elegido {
+  border-color: rgba(242, 84, 27, 0.45);
+  box-shadow: var(--sombra), 0 0 0 3px var(--naranja-suave);
+}
+
+.informe-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.informe-icono {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  color: var(--naranja);
+  background: var(--naranja-suave);
+  flex-shrink: 0;
+}
+
+.informe-titulo {
+  flex: 1;
+  min-width: 0;
+}
+
+.informe-titulo h3 {
+  font-size: 15.5px;
+  font-weight: 700;
+}
+
+.informe-titulo small {
+  color: var(--texto-3);
+}
+
+.resumen {
+  color: var(--texto-2);
+  max-width: 70ch;
+}
+
+.cifras {
+  gap: 10px;
+}
+
+.cambio {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cambio.sube {
+  color: var(--verde);
+}
+
+.cambio.baja {
+  color: var(--rojo);
+}
+
+.programa strong {
+  display: block;
+  font-size: 14px;
+}
+
+.programa small {
+  display: block;
+  color: var(--texto-3);
+}
+
+.proximo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--naranja);
+}
+
+.proximo .material-symbols-rounded {
+  font-size: 15px;
+}
+
+.narrativa {
+  color: var(--texto-2);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.grafico-espacio {
+  height: 130px;
+  margin-bottom: 16px;
+}
+
+.hallazgos {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hallazgo {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.hallazgo .material-symbols-rounded {
+  font-size: 18px;
+}
+
+.hallazgo-verde .material-symbols-rounded {
+  color: var(--verde);
+}
+
+.hallazgo-ambar .material-symbols-rounded {
+  color: var(--ambar);
+}
+
+.hallazgo-naranja .material-symbols-rounded {
+  color: var(--naranja);
+}

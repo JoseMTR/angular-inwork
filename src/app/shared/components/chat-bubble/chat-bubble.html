@@ -1,0 +1,18 @@
+<div [class]="propio ? 'fila propia' : 'fila'">
+  @if (ia) {
+    <span class="marca-ia">
+      <span class="material-symbols-rounded">auto_awesome</span>
+    </span>
+  }
+  <div [class]="ia ? 'burbuja burbuja-ia' : 'burbuja'">
+    @if (autor || hora) {
+      <div class="meta">
+        <strong>{{ autor }}</strong>
+        <span>{{ hora }}</span>
+      </div>
+    }
+    <div class="contenido">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

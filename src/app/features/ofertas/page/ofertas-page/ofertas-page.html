@@ -1,0 +1,91 @@
+<div class="pagina">
+  <app-page-header titulo="Ofertas" grupo="Marketplace" descripcion="Las propuestas que los trabajadores envían a cada trabajo publicado."></app-page-header>
+
+  <div class="rejilla c-4">
+    @for (dato of ofertasService.resumen(); track dato.titulo) {
+      <app-stat-card [dato]="dato"></app-stat-card>
+    }
+  </div>
+
+  <app-filter-bar placeholder="Buscar por trabajo o trabajador" [filtros]="['Estado', 'Trabajo', 'Fecha']"></app-filter-bar>
+
+  <div class="rejilla">
+    <app-tarjeta titulo="Ofertas recibidas" subtitulo="Comparadas con el presupuesto del cliente">
+      <div class="tabla-contenedor">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Trabajo</th>
+              <th>Trabajador</th>
+              <th>Valor ofertado</th>
+              <th>Mensaje</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (oferta of ofertasService.ofertas(); track oferta.id_oferta) {
+              <tr [class.seleccionada]="oferta.id_oferta === seleccionada.id_oferta">
+                <td class="fuerte">{{ oferta.trabajo }}</td>
+                <td>
+                  <div class="celda-persona">
+                    <app-avatar [nombre]="oferta.trabajador" tamano="chico"></app-avatar>
+                    <strong>{{ oferta.trabajador }}</strong>
+                  </div>
+                </td>
+                <td>
+                  <span class="numero fuerte">{{ oferta.valor_oferta | moneda }}</span>
+                  <small [class]="diferencia(oferta) > 0 ? 'comparacion arriba' : 'comparacion abajo'">
+                    {{ diferencia(oferta) > 0 ? '+' : '' }}{{ diferencia(oferta) }}% vs. {{ oferta.presupuesto | moneda }}
+                  </small>
+                </td>
+                <td class="texto-2"><span class="recortar">{{ oferta.mensaje }}</span></td>
+                <td class="texto-3 fecha">{{ oferta.fecha_oferta }}</td>
+                <td><app-status-pill [estado]="oferta.estado_oferta"></app-status-pill></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-tarjeta>
+
+    <app-tarjeta titulo="Oferta seleccionada" [subtitulo]="'#' + seleccionada.id_oferta + ', ' + seleccionada.fecha_oferta">
+      <div class="oferta">
+        <div class="celda-persona">
+          <app-avatar [nombre]="seleccionada.trabajador"></app-avatar>
+          <div>
+            <strong>{{ seleccionada.trabajador }}</strong>
+            <small>4,98 de calificación, 126 contratos</small>
+          </div>
+        </div>
+
+        <div class="comparar">
+          <div class="dato-mini">
+            <span>Ofertó</span>
+            <strong>{{ seleccionada.valor_oferta | moneda }}</strong>
+          </div>
+          <div class="dato-mini">
+            <span>Presupuesto</span>
+            <strong>{{ seleccionada.presupuesto | moneda }}</strong>
+          </div>
+        </div>
+
+        <div>
+          <span class="subtitulo-seccion">Mensaje completo</span>
+          <blockquote>{{ seleccionada.mensaje }}</blockquote>
+        </div>
+
+        <div class="acciones">
+          <a class="boton boton-claro boton-pequeno" routerLink="/admin/usuarios">
+            <span class="material-symbols-rounded">person</span>
+            Ver perfil del trabajador
+          </a>
+          <a class="boton boton-claro boton-pequeno" routerLink="/admin/trabajos">
+            <span class="material-symbols-rounded">work</span>
+            Ver trabajo
+          </a>
+        </div>
+      </div>
+    </app-tarjeta>
+  </div>
+</div>

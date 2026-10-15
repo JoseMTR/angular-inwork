@@ -1,0 +1,72 @@
+<div class="pagina">
+  <app-page-header titulo="Chats y mensajes" grupo="Moderación" descripcion="Conversaciones entre clientes y trabajadores. Úsalas cuando haya un reporte o una disputa."></app-page-header>
+
+  <div class="espacio">
+    <aside class="lista-chats vidrio">
+      <label class="buscar">
+        <span class="material-symbols-rounded">search</span>
+        <input type="search" placeholder="Buscar por usuario o trabajo">
+      </label>
+      <ul class="chats">
+        @for (chat of chatsService.chats(); track chat.id_chat) {
+          <li [class]="chat.id_chat === seleccionado.id_chat ? 'chat activo' : 'chat'">
+            <app-avatar [nombre]="chat.trabajador"></app-avatar>
+            <div class="chat-texto">
+              <div class="chat-fila">
+                <strong>{{ chat.trabajo }}</strong>
+                <span class="hora">{{ chat.hora }}</span>
+              </div>
+              <small>{{ chat.cliente }} y {{ chat.trabajador }}</small>
+              <span class="ultimo">{{ chat.ultimo_mensaje }}</span>
+              @if (chat.tiene_reporte) {
+                <span class="etiqueta-reporte">
+                  <span class="material-symbols-rounded">flag</span>
+                  Con reporte
+                </span>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    </aside>
+
+    <section class="conversacion vidrio">
+      <header class="conversacion-cabecera">
+        <div>
+          <h2>{{ seleccionado.trabajo }}</h2>
+          <span class="texto-2">{{ seleccionado.cliente }} (cliente) y {{ seleccionado.trabajador }} (trabajador)</span>
+        </div>
+        <div class="acciones">
+          @if (seleccionado.tiene_reporte) {
+            <a class="boton boton-peligro boton-pequeno" routerLink="/admin/reportes">
+              <span class="material-symbols-rounded">flag</span>
+              Ver reporte #77
+            </a>
+          }
+          <a class="boton boton-claro boton-pequeno" routerLink="/admin/trabajos">
+            <span class="material-symbols-rounded">work</span>
+            Ver trabajo
+          </a>
+        </div>
+      </header>
+
+      <div class="aviso">
+        <span class="material-symbols-rounded">visibility</span>
+        Modo solo lectura. Los administradores pueden leer este chat, pero no escribir en él.
+      </div>
+
+      <div class="mensajes">
+        @for (mensaje of chatsService.mensajes(); track mensaje.id_mensaje) {
+          <app-chat-bubble [autor]="mensaje.remitente" [hora]="mensaje.hora" [propio]="!mensaje.del_cliente">
+            {{ mensaje.mensaje }}
+          </app-chat-bubble>
+        }
+      </div>
+
+      <footer class="pie">
+        <span class="material-symbols-rounded">lock</span>
+        No se pueden enviar mensajes desde el panel.
+      </footer>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,69 @@
+<div class="pagina">
+  <app-page-header titulo="Pagos" grupo="Finanzas" descripcion="El dinero que entra a la custodia de InWork, lo que se le paga a cada trabajador y las comisiones.">
+    <span class="chip origen">
+      <span class="material-symbols-rounded">cloud_sync</span>
+      Datos de la API de pagos
+    </span>
+  </app-page-header>
+
+  <div class="rejilla c-4">
+    @for (dato of pagosService.resumen(); track dato.titulo) {
+      <app-stat-card [dato]="dato"></app-stat-card>
+    }
+  </div>
+
+  <div class="rejilla c-ancha">
+    <app-tarjeta titulo="Comisión por mes" subtitulo="En millones de pesos">
+      <app-grafico-barras [barras]="pagosService.ingresosPorMes()" color="morado" [alto]="330"></app-grafico-barras>
+    </app-tarjeta>
+    <app-tarjeta titulo="Métodos de pago" subtitulo="9.100 pagos este mes">
+      <app-grafico-dona [segmentos]="pagosService.metodos()" textoCentral="con Nequi"></app-grafico-dona>
+    </app-tarjeta>
+  </div>
+
+  <app-filter-bar placeholder="Buscar por referencia o contratación" [filtros]="['Método', 'Estado', 'Fecha']">
+    <button class="boton boton-claro" type="button">
+      <span class="material-symbols-rounded">download</span>
+      Exportar
+    </button>
+  </app-filter-bar>
+
+  <app-tarjeta titulo="Movimientos" subtitulo="Cada depósito del cliente pasa por la custodia antes de llegar al trabajador">
+    <div class="tabla-contenedor">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Pago</th>
+            <th>Contratación</th>
+            <th>Monto</th>
+            <th>Comisión</th>
+            <th>Método</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (pago of pagosService.pagos(); track pago.id_pago) {
+            <tr>
+              <td>
+                <strong class="bloque-texto">#{{ pago.id_pago }}</strong>
+                <small class="texto-3 referencia">{{ pago.referencia }}</small>
+              </td>
+              <td><a class="enlace" routerLink="/admin/contrataciones">#{{ pago.id_contratacion }}</a></td>
+              <td class="numero fuerte">{{ pago.monto | moneda }}</td>
+              <td class="numero texto-2">{{ pago.comision_plataforma | moneda }}</td>
+              <td>
+                <span class="chip metodo">
+                  <span class="material-symbols-rounded">{{ icono(pago.metodo_pago) }}</span>
+                  {{ nombreMetodo(pago.metodo_pago) }}
+                </span>
+              </td>
+              <td><app-status-pill [estado]="pago.estado_pago"></app-status-pill></td>
+              <td class="texto-3 fecha">{{ pago.fecha_pago }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </app-tarjeta>
+</div>

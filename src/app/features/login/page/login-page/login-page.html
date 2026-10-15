@@ -1,0 +1,94 @@
+<div class="login">
+  <section class="marca vidrio">
+    <div class="marca-logo">
+      <span class="logo">
+        <span class="material-symbols-rounded">bolt</span>
+      </span>
+      <div>
+        <strong>InWork</strong>
+        <small>Panel de administración</small>
+      </div>
+    </div>
+
+    <div class="marca-texto">
+      <h1>Toda la plataforma, vista desde un solo lugar.</h1>
+      <p>Revisa usuarios, trabajos, contrataciones y pagos de InWork, atiende reportes y pídele a la IA los informes que necesites.</p>
+    </div>
+
+    <div class="ejemplos">
+      <article class="ejemplo">
+        <span class="ejemplo-icono azul">
+          <span class="material-symbols-rounded">group</span>
+        </span>
+        <div>
+          <span class="texto-3 texto-chico">Usuarios activos</span>
+          <strong class="numero">42.890</strong>
+        </div>
+        <span class="sube">+8,2%</span>
+      </article>
+      <article class="ejemplo">
+        <span class="ejemplo-icono verde">
+          <span class="material-symbols-rounded">task_alt</span>
+        </span>
+        <div>
+          <span class="texto-3 texto-chico">Tasa de éxito</span>
+          <strong class="numero">96,4%</strong>
+        </div>
+        <span class="sube">+1,3%</span>
+      </article>
+    </div>
+  </section>
+
+  <section class="formulario vidrio">
+    <div class="formulario-cabecera">
+      <h2>Inicia sesión</h2>
+      <p>Usa la cuenta que te asignó la plataforma.</p>
+    </div>
+
+    <form class="campos">
+      <div class="campo">
+        <label for="correo">Correo</label>
+        <div class="entrada-icono">
+          <span class="material-symbols-rounded">mail</span>
+          <input id="correo" class="entrada" type="email" placeholder="nombre&#64;inwork.co">
+        </div>
+        <span class="ayuda">Escribe un correo válido.</span>
+      </div>
+
+      <div class="campo">
+        <label for="clave">Contraseña</label>
+        <div class="entrada-icono">
+          <span class="material-symbols-rounded">lock</span>
+          <input id="clave" class="entrada" type="password" placeholder="Tu contraseña">
+          <button class="boton-ojo" type="button" aria-label="Mostrar contraseña">
+            <span class="material-symbols-rounded">visibility</span>
+          </button>
+        </div>
+        <span class="ayuda">Mínimo 6 caracteres.</span>
+      </div>
+
+      <div class="campo">
+        <label>Entrar como</label>
+        <app-role-selector seleccionado="Administrador"></app-role-selector>
+      </div>
+
+      <div class="opciones">
+        <label class="recordar">
+          <input type="checkbox" checked>
+          Recordarme
+        </label>
+        <a class="olvido" href="#">¿Olvidaste tu contraseña?</a>
+      </div>
+
+      <a class="boton boton-primario boton-bloque ingresar" routerLink="/admin/dashboard">
+        Ingresar al panel
+        <span class="material-symbols-rounded">arrow_forward</span>
+      </a>
+    </form>
+
+    <p class="nota">
+      <span class="material-symbols-rounded">info</span>
+      No hay registro: las cuentas las crea un administrador de InWork.
+    </p>
+  </section>
+</div>

@@ -1,0 +1,130 @@
+<div class="pagina">
+  <app-page-header titulo="Reportes" grupo="Moderación" descripcion="Las denuncias entre usuarios y cómo las resuelve el equipo de moderación."></app-page-header>
+
+  <div class="rejilla c-4">
+    @for (dato of reportesService.resumen(); track dato.titulo) {
+      <app-stat-card [dato]="dato"></app-stat-card>
+    }
+  </div>
+
+  <app-filter-bar placeholder="Buscar por usuario o trabajo" [filtros]="['Motivo', 'Estado', 'Fecha']"></app-filter-bar>
+
+  <div class="rejilla">
+    <app-tarjeta titulo="Denuncias" subtitulo="Las pendientes más antiguas primero">
+      <div class="tabla-contenedor">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Motivo</th>
+              <th>Reportante</th>
+              <th>Reportado</th>
+              <th>Trabajo</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (reporte of reportesService.reportes(); track reporte.id_reporte) {
+              <tr [class.seleccionada]="reporte.id_reporte === seleccionado.id_reporte">
+                <td><span class="chip">{{ motivo(reporte.motivo) }}</span></td>
+                <td>{{ reporte.reportante }}</td>
+                <td class="fuerte">{{ reporte.reportado }}</td>
+                <td class="texto-2">{{ reporte.trabajo }}</td>
+                <td><app-status-pill [estado]="reporte.estado_reporte"></app-status-pill></td>
+                <td class="texto-3 fecha">{{ reporte.created }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-tarjeta>
+
+    <app-tarjeta [titulo]="'Reporte #' + seleccionado.id_reporte" [subtitulo]="motivo(seleccionado.motivo) + ', ' + seleccionado.trabajo">
+      <div class="reporte">
+        <div class="partes">
+          <div class="celda-persona">
+            <app-avatar [nombre]="seleccionado.reportante" tamano="chico"></app-avatar>
+            <div>
+              <small>Reporta</small>
+              <strong>{{ seleccionado.reportante }}</strong>
+            </div>
+          </div>
+          <span class="material-symbols-rounded">arrow_forward</span>
+          <div class="celda-persona">
+            <app-avatar [nombre]="seleccionado.reportado" tamano="chico"></app-avatar>
+            <div>
+              <small>Reportado</small>
+              <strong>{{ seleccionado.reportado }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <span class="subtitulo-seccion">Descripción</span>
+          <p class="texto-2 descripcion">{{ seleccionado.descripcion }}</p>
+        </div>
+
+        <div>
+          <span class="subtitulo-seccion">Evidencias</span>
+          <div class="evidencias">
+            <div class="imagen-falsa"><span class="material-symbols-rounded">screenshot</span>Captura del chat</div>
+            <div class="imagen-falsa"><span class="material-symbols-rounded">receipt_long</span>Comprobante</div>
+          </div>
+        </div>
+
+        <dl class="detalle">
+          <div>
+            <dt>Revisor asignado</dt>
+            <dd>{{ seleccionado.revisor }}</dd>
+          </div>
+          <div>
+            <dt>Estado</dt>
+            <dd><app-status-pill [estado]="seleccionado.estado_reporte"></app-status-pill></dd>
+          </div>
+        </dl>
+
+        <div>
+          <span class="subtitulo-seccion">Historial</span>
+          <ul class="linea-tiempo">
+            @for (paso of reportesService.historial(); track paso.titulo) {
+              <li [class]="paso.estado">
+                <strong>{{ paso.titulo }}</strong>
+                <small>{{ paso.fecha }}</small>
+              </li>
+            }
+          </ul>
+        </div>
+
+        <div class="campo">
+          <label for="resolucion">Resolución</label>
+          <textarea id="resolucion" class="entrada" placeholder="Explica qué se decidió y por qué"></textarea>
+        </div>
+
+        <div class="acciones">
+          <button class="boton boton-claro boton-pequeno" type="button">
+            <span class="material-symbols-rounded">front_hand</span>
+            Tomar reporte
+          </button>
+          <button class="boton boton-exito boton-pequeno" type="button">
+            <span class="material-symbols-rounded">gavel</span>
+            Resolver
+          </button>
+          <button class="boton boton-claro boton-pequeno" type="button">
+            <span class="material-symbols-rounded">close</span>
+            Rechazar
+          </button>
+        </div>
+        <div class="acciones">
+          <a class="boton boton-suave boton-pequeno" routerLink="/admin/chats">
+            <span class="material-symbols-rounded">forum</span>
+            Abrir chat del trabajo
+          </a>
+          <button class="boton boton-peligro boton-pequeno" type="button">
+            <span class="material-symbols-rounded">block</span>
+            Suspender a {{ seleccionado.reportado }}
+          </button>
+        </div>
+      </div>
+    </app-tarjeta>
+  </div>
+</div>

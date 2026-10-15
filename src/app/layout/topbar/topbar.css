@@ -1,0 +1,88 @@
+:host {
+  display: block;
+}
+
+.superior {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  border-radius: 22px;
+}
+
+.buscar {
+  flex: 1 1 320px;
+  max-width: 460px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid var(--linea);
+  color: var(--texto-3);
+}
+
+.buscar input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 13.5px;
+  color: var(--texto);
+}
+
+kbd {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 7px;
+  border-radius: 7px;
+  border: 1px solid var(--linea-fuerte);
+  background: #fff;
+  color: var(--texto-3);
+}
+
+.derecha {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.campana {
+  position: relative;
+}
+
+.campana .punto {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--naranja);
+  border: 2px solid #fff;
+}
+
+@media (max-width: 1280px) {
+  .segmentado {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .superior {
+    flex-wrap: wrap;
+  }
+
+  .buscar {
+    max-width: none;
+  }
+
+  kbd {
+    display: none;
+  }
+}

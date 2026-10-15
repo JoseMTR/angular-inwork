@@ -1,0 +1,195 @@
+<div class="pagina">
+  <app-page-header titulo="Usuarios" grupo="Personas" descripcion="Todas las personas registradas en InWork. Elige una para ver toda su actividad."></app-page-header>
+
+  <div class="rejilla c-4">
+    @for (dato of usuariosService.resumen(); track dato.titulo) {
+      <app-stat-card [dato]="dato"></app-stat-card>
+    }
+  </div>
+
+  <app-filter-bar placeholder="Buscar por nombre, correo o cédula" [filtros]="['Rol', 'Ciudad', 'Estado', 'Ordenar por']">
+    <button class="boton boton-claro" type="button">
+      <span class="material-symbols-rounded">download</span>
+      Exportar
+    </button>
+  </app-filter-bar>
+
+  <app-tarjeta titulo="Listado de usuarios" subtitulo="48.312 registrados, 8 en esta página">
+    <div class="tabla-contenedor">
+      <table class="tabla compacta">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Documento</th>
+            <th>Ciudad</th>
+            <th>Rol</th>
+            <th>Trabajos</th>
+            <th>Contratos</th>
+            <th>Calificación</th>
+            <th>Correo</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (usuario of usuariosService.usuarios(); track usuario.id_usuario) {
+            <tr [class.seleccionada]="usuario.id_usuario === seleccionado.id_usuario">
+              <td>
+                <div class="celda-persona">
+                  <app-avatar [nombre]="usuario.nombre + ' ' + usuario.apellido"></app-avatar>
+                  <div>
+                    <strong>{{ usuario.nombre }} {{ usuario.apellido }}</strong>
+                    <small>{{ usuario.correo }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="numero">{{ usuario.numero_identificacion }}</span>
+                <small class="bajo">{{ usuario.tipo_identificacion }}</small>
+              </td>
+              <td>{{ usuario.ciudad }}</td>
+              <td><span class="chip">{{ usuario.rol }}</span></td>
+              <td class="numero">{{ usuario.total_trabajos }}</td>
+              <td class="numero">{{ usuario.total_contratos }}</td>
+              <td>
+                @if (usuario.promedio_calificacion > 0) {
+                  <span class="nota">
+                    <span class="material-symbols-rounded">star</span>
+                    {{ usuario.promedio_calificacion }}
+                  </span>
+                } @else {
+                  <span class="texto-3">Sin reseñas</span>
+                }
+              </td>
+              <td>
+                <span [class]="usuario.correo_verificado ? 'verificado si' : 'verificado no'">
+                  <span class="material-symbols-rounded">{{ usuario.correo_verificado ? 'verified' : 'error' }}</span>
+                  {{ usuario.correo_verificado ? 'Verificado' : 'Sin verificar' }}
+                </span>
+              </td>
+              <td><app-status-pill [estado]="usuario.estado"></app-status-pill></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="paginacion">
+      <span>Mostrando 1 a 8 de 48.312</span>
+      <div class="paginas">
+        <span class="activa">1</span>
+        <span>2</span>
+        <span>3</span>
+        <span>…</span>
+        <span>6.039</span>
+      </div>
+    </div>
+  </app-tarjeta>
+
+  <section class="detalle-usuario vidrio">
+    <header class="perfil">
+      <app-avatar [nombre]="seleccionado.nombre + ' ' + seleccionado.apellido" tamano="grande"></app-avatar>
+      <div class="perfil-texto">
+        <div class="perfil-nombre">
+          <h2>{{ seleccionado.nombre }} {{ seleccionado.apellido }}</h2>
+          <app-status-pill [estado]="seleccionado.estado"></app-status-pill>
+        </div>
+        <span class="texto-2">{{ seleccionado.correo }}, {{ seleccionado.rol }} desde {{ seleccionado.created }}</span>
+      </div>
+      <div class="acciones">
+        <a class="boton boton-claro" routerLink="/admin/reportes">
+          <span class="material-symbols-rounded">flag</span>
+          Ver reportes
+        </a>
+        <button class="boton boton-claro" type="button">
+          <span class="material-symbols-rounded">manage_accounts</span>
+          Cambiar rol
+        </button>
+        <button class="boton boton-peligro" type="button">
+          <span class="material-symbols-rounded">block</span>
+          Suspender
+        </button>
+      </div>
+    </header>
+
+    <div class="segmentado pestanas">
+      @for (pestana of pestanas; track pestana) {
+        <button type="button" [class]="pestana === 'Resumen' ? 'segmento activo' : 'segmento'">{{ pestana }}</button>
+      }
+    </div>
+
+    <div class="cuerpo">
+      <div class="bloque">
+        <span class="subtitulo-seccion">Datos personales</span>
+        <dl class="detalle">
+          <div>
+            <dt>Teléfono</dt>
+            <dd>{{ seleccionado.telefono }}</dd>
+          </div>
+          <div>
+            <dt>Ciudad</dt>
+            <dd>{{ seleccionado.ciudad }}</dd>
+          </div>
+          <div>
+            <dt>Dirección</dt>
+            <dd>{{ seleccionado.direccion }}</dd>
+          </div>
+          <div>
+            <dt>Nacimiento</dt>
+            <dd>{{ seleccionado.fecha_nacimiento }}</dd>
+          </div>
+          <div>
+            <dt>Documento</dt>
+            <dd>{{ seleccionado.tipo_identificacion }} {{ seleccionado.numero_identificacion }}</dd>
+          </div>
+          <div>
+            <dt>Registro</dt>
+            <dd>{{ seleccionado.created }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="bloque">
+        <span class="subtitulo-seccion">Habilidades</span>
+        <div class="fila-chips">
+          @for (habilidad of usuariosService.habilidades(); track habilidad.nombre) {
+            <span class="chip">{{ habilidad.nombre }} <small>{{ habilidad.anios_experiencia }} años</small></span>
+          }
+        </div>
+        <div class="totales">
+          <div class="dato-mini">
+            <span>Trabajos</span>
+            <strong>{{ seleccionado.total_trabajos }}</strong>
+          </div>
+          <div class="dato-mini">
+            <span>Contratos</span>
+            <strong>{{ seleccionado.total_contratos }}</strong>
+          </div>
+          <div class="dato-mini">
+            <span>Ofertas</span>
+            <strong>{{ seleccionado.total_ofertas }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="bloque">
+        <span class="subtitulo-seccion">Actividad</span>
+        <ul class="linea-tiempo">
+          @for (evento of usuariosService.actividad(); track evento.titulo) {
+            <li [class]="evento.estado">
+              <strong>{{ evento.titulo }}</strong>
+              <small>{{ evento.fecha }}</small>
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="rejilla c-2">
+    <app-tarjeta titulo="Registros por mes" subtitulo="Usuarios nuevos en los últimos 6 meses">
+      <app-grafico-barras [barras]="usuariosService.registrosPorMes()" color="azul"></app-grafico-barras>
+    </app-tarjeta>
+    <app-tarjeta titulo="Usuarios por ciudad" subtitulo="Las 5 ciudades con más usuarios">
+      <app-grafico-barras [barras]="usuariosService.usuariosPorCiudad()" [horizontal]="true" color="azul"></app-grafico-barras>
+    </app-tarjeta>
+  </div>
+</div>

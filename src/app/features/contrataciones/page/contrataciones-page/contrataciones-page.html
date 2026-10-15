@@ -1,0 +1,121 @@
+<div class="pagina">
+  <app-page-header titulo="Contrataciones" grupo="Marketplace" descripcion="Los acuerdos que nacen cuando un cliente acepta una oferta."></app-page-header>
+
+  <div class="rejilla c-3">
+    @for (dato of contratacionesService.resumen(); track dato.titulo) {
+      <app-stat-card [dato]="dato"></app-stat-card>
+    }
+  </div>
+
+  <app-filter-bar placeholder="Buscar por trabajo, cliente o trabajador" [filtros]="['Estado', 'Período']"></app-filter-bar>
+
+  <div class="rejilla">
+    <app-tarjeta titulo="Contrataciones" subtitulo="Las más recientes primero">
+      <div class="tabla-contenedor">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Trabajo</th>
+              <th>Cliente</th>
+              <th>Trabajador</th>
+              <th>Valor</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (contrato of contratacionesService.contrataciones(); track contrato.id_contratacion) {
+              <tr [class.seleccionada]="contrato.id_contratacion === seleccionada.id_contratacion">
+                <td>
+                  <strong class="bloque-texto">{{ contrato.trabajo }}</strong>
+                  <small class="texto-3">#{{ contrato.id_contratacion }}</small>
+                </td>
+                <td>{{ contrato.cliente }}</td>
+                <td>{{ contrato.trabajador }}</td>
+                <td class="numero fuerte">{{ contrato.valor | moneda }}</td>
+                <td class="texto-2 fecha">{{ contrato.fecha_contratacion }}</td>
+                <td><app-status-pill [estado]="contrato.estado_contratacion"></app-status-pill></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-tarjeta>
+
+    <app-tarjeta [titulo]="'Contratación #' + seleccionada.id_contratacion" [subtitulo]="seleccionada.trabajo">
+      <div class="contrato">
+        <div class="partes">
+          <div class="parte">
+            <span class="texto-3 texto-chico">Cliente</span>
+            <div class="celda-persona">
+              <app-avatar [nombre]="seleccionada.cliente" tamano="chico"></app-avatar>
+              <strong>{{ seleccionada.cliente }}</strong>
+            </div>
+          </div>
+          <span class="material-symbols-rounded flecha">sync_alt</span>
+          <div class="parte">
+            <span class="texto-3 texto-chico">Trabajador</span>
+            <div class="celda-persona">
+              <app-avatar [nombre]="seleccionada.trabajador" tamano="chico"></app-avatar>
+              <strong>{{ seleccionada.trabajador }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="dato-mini">
+          <span>Oferta aceptada</span>
+          <strong>{{ seleccionada.valor | moneda }}</strong>
+        </div>
+
+        <div>
+          <span class="subtitulo-seccion">Pagos vinculados</span>
+          <ul class="lista">
+            @for (pago of contratacionesService.pagos(); track pago.referencia) {
+              <li>
+                <div>
+                  <strong class="bloque-texto">{{ pago.tipo }}</strong>
+                  <small class="texto-3">{{ pago.referencia }}</small>
+                </div>
+                <div class="pago-derecha">
+                  <strong class="numero">{{ pago.monto | moneda }}</strong>
+                  <app-status-pill [estado]="pago.estado"></app-status-pill>
+                </div>
+              </li>
+            }
+          </ul>
+          <p class="nota-api">
+            <span class="material-symbols-rounded">cloud_sync</span>
+            Estos datos vienen de la API de pagos (Express + MySQL).
+          </p>
+        </div>
+
+        <div class="acciones">
+          <a class="boton boton-claro boton-pequeno" routerLink="/admin/pagos">
+            <span class="material-symbols-rounded">payments</span>
+            Pagos
+          </a>
+          <a class="boton boton-claro boton-pequeno" routerLink="/admin/calificaciones">
+            <span class="material-symbols-rounded">star_rate</span>
+            Calificaciones
+          </a>
+          <a class="boton boton-suave boton-pequeno" routerLink="/admin/chats">
+            <span class="material-symbols-rounded">forum</span>
+            Abrir chat
+          </a>
+        </div>
+
+        <div>
+          <span class="subtitulo-seccion">Estado de la contratación</span>
+          <ul class="linea-tiempo">
+            @for (paso of contratacionesService.pasos(); track paso.titulo) {
+              <li [class]="paso.estado">
+                <strong>{{ paso.titulo }}</strong>
+                <small>{{ paso.detalle }}</small>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+    </app-tarjeta>
+  </div>
+</div>

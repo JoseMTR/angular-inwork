@@ -1,0 +1,10 @@
+<div class="roles" role="radiogroup" aria-label="Rol">
+  @for (rol of roles; track rol.nombre) {
+    <label class="rol">
+      <input type="radio" name="rol" [checked]="rol.nombre === seleccionado">
+      <span class="material-symbols-rounded">{{ rol.icono }}</span>
+      <strong>{{ rol.nombre }}</strong>
+      <small>{{ rol.descripcion }}</small>
+    </label>
+  }
+</div>

@@ -1,0 +1,101 @@
+<div class="pagina">
+  <app-page-header titulo="Informes automáticos" grupo="General" descripcion="La IA genera un informe cada día, cada semana y cada mes sin que nadie lo pida.">
+    <div class="segmentado">
+      @for (pestana of pestanas; track pestana) {
+        <button type="button" [class]="pestana === pestanaActiva ? 'segmento activo' : 'segmento'">{{ pestana }}</button>
+      }
+    </div>
+  </app-page-header>
+
+  <div class="rejilla c-lateral">
+    <div class="columna">
+      @for (informe of informesService.informes(); track informe.id_informe) {
+        <article [class]="informe.id_informe === 30 ? 'informe vidrio elegido' : 'informe vidrio'">
+          <header class="informe-cabecera">
+            <span class="informe-icono">
+              <span class="material-symbols-rounded">description</span>
+            </span>
+            <div class="informe-titulo">
+              <h3>{{ informe.titulo }}</h3>
+              <small>{{ informe.generado }}</small>
+            </div>
+            <app-status-pill [estado]="informe.estado"></app-status-pill>
+          </header>
+          <p class="resumen">{{ informe.resumen }}</p>
+          @if (informe.cifras.length > 0) {
+            <div class="rejilla c-3 cifras">
+              @for (cifra of informe.cifras; track cifra.etiqueta) {
+                <div class="dato-mini">
+                  <span>{{ cifra.etiqueta }}</span>
+                  <strong>{{ cifra.valor }}</strong>
+                  <em [class]="cifra.sube ? 'cambio sube' : 'cambio baja'">{{ cifra.variacion }}</em>
+                </div>
+              }
+            </div>
+            <div class="acciones">
+              <button class="boton boton-claro boton-pequeno" type="button">
+                <span class="material-symbols-rounded">open_in_new</span>
+                Abrir
+              </button>
+              <button class="boton boton-claro boton-pequeno" type="button">
+                <span class="material-symbols-rounded">picture_as_pdf</span>
+                Descargar PDF
+              </button>
+              <button class="boton boton-claro boton-pequeno" type="button">
+                <span class="material-symbols-rounded">share</span>
+                Compartir
+              </button>
+            </div>
+          }
+        </article>
+      }
+    </div>
+
+    <div class="columna">
+      <app-tarjeta titulo="Programación" subtitulo="Cuándo se genera cada informe">
+        <ul class="lista">
+          @for (programa of informesService.programaciones(); track programa.tipo) {
+            <li>
+              <div class="programa">
+                <strong>{{ programa.tipo }}</strong>
+                <small>{{ programa.descripcion }} a las {{ programa.hora }}</small>
+                <span class="proximo">
+                  <span class="material-symbols-rounded">schedule</span>
+                  {{ programa.activo ? programa.proximo : 'En pausa' }}
+                </span>
+              </div>
+              <label class="interruptor">
+                <input type="checkbox" [checked]="programa.activo" [attr.aria-label]="'Activar informe ' + programa.tipo">
+                <span></span>
+              </label>
+            </li>
+          }
+        </ul>
+      </app-tarjeta>
+
+      <app-tarjeta titulo="Informe diario, 13 oct 2026" subtitulo="Vista del informe">
+        <p class="narrativa">
+          Ayer fue un día fuerte para la categoría Hogar. Se publicaron 138 trabajos y se cerraron 64 contrataciones.
+          La comisión bajó un poco por 3 pagos fallidos que quedaron pendientes.
+        </p>
+        <div class="imagen-falsa grafico-espacio">
+          <span class="material-symbols-rounded">insert_chart</span>
+          Espacio para el gráfico del informe
+        </div>
+        <span class="subtitulo-seccion">Hallazgos y recomendaciones</span>
+        <ul class="hallazgos">
+          @for (hallazgo of informesService.hallazgos(); track hallazgo.texto) {
+            <li [class]="'hallazgo hallazgo-' + hallazgo.tono">
+              <span class="material-symbols-rounded">{{ hallazgo.icono }}</span>
+              {{ hallazgo.texto }}
+            </li>
+          }
+        </ul>
+        <a class="boton boton-suave boton-bloque preguntar" routerLink="/admin/ia">
+          <span class="material-symbols-rounded">auto_awesome</span>
+          Preguntarle a la IA sobre este informe
+        </a>
+      </app-tarjeta>
+    </div>
+  </div>
+</div>

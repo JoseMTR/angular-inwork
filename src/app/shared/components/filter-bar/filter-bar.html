@@ -1,0 +1,15 @@
+<div class="barra vidrio">
+  <label class="buscador">
+    <span class="material-symbols-rounded">search</span>
+    <input type="search" [placeholder]="placeholder">
+  </label>
+  @for (filtro of filtros; track filtro) {
+    <button class="filtro" type="button">
+      {{ filtro }}
+      <span class="material-symbols-rounded">expand_more</span>
+    </button>
+  }
+  <div class="extra">
+    <ng-content></ng-content>
+  </div>
+</div>

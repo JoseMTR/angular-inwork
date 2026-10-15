@@ -1,0 +1,53 @@
+:host {
+  display: inline-flex;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pill::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.pill-verde {
+  background: var(--verde-suave);
+  color: var(--verde);
+}
+
+.pill-azul {
+  background: var(--azul-suave);
+  color: var(--azul);
+}
+
+.pill-morado {
+  background: var(--morado-suave);
+  color: var(--morado);
+}
+
+.pill-ambar {
+  background: var(--ambar-suave);
+  color: var(--ambar);
+}
+
+.pill-rojo {
+  background: var(--rojo-suave);
+  color: var(--rojo);
+}
+
+.pill-gris {
+  background: var(--gris-suave);
+  color: var(--texto-2);
+}

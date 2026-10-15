@@ -1,0 +1,25 @@
+<header class="superior vidrio">
+  <label class="buscar">
+    <span class="material-symbols-rounded">search</span>
+    <input type="search" placeholder="Buscar usuarios, trabajos, pagos o reportes">
+    <kbd>Ctrl K</kbd>
+  </label>
+
+  <div class="derecha">
+    <div class="segmentado" role="group" aria-label="Rango de fechas">
+      @for (rango of rangos; track rango) {
+        <button type="button" [class]="rango === rangoActivo ? 'segmento activo' : 'segmento'">{{ rango }}</button>
+      }
+    </div>
+
+    <button class="boton boton-claro boton-icono campana" type="button" aria-label="Notificaciones">
+      <span class="material-symbols-rounded">notifications</span>
+      <span class="punto"></span>
+    </button>
+
+    <a class="boton boton-primario" routerLink="/admin/ia">
+      <span class="material-symbols-rounded">auto_awesome</span>
+      Pedir informe a la IA
+    </a>
+  </div>
+</header>

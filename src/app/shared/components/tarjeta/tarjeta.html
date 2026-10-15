@@ -1,0 +1,16 @@
+<section class="tarjeta vidrio">
+  <header class="tarjeta-cabecera">
+    <div class="tarjeta-titulos">
+      <h3>{{ titulo }}</h3>
+      @if (subtitulo) {
+        <p>{{ subtitulo }}</p>
+      }
+    </div>
+    <div class="tarjeta-acciones">
+      <ng-content select="[acciones]"></ng-content>
+    </div>
+  </header>
+  <div class="tarjeta-cuerpo">
+    <ng-content></ng-content>
+  </div>
+</section>

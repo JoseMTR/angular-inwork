@@ -1,0 +1,89 @@
+.rol {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  cursor: pointer;
+}
+
+.rol.elegido {
+  border-color: rgba(242, 84, 27, 0.45);
+  box-shadow: var(--sombra), 0 0 0 3px var(--naranja-suave);
+}
+
+.rol-icono {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  color: var(--texto-2);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--linea);
+}
+
+.rol.elegido .rol-icono {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--naranja-2), var(--naranja));
+}
+
+.rol-texto {
+  flex: 1;
+  min-width: 0;
+}
+
+.rol-texto h3 {
+  font-size: 15.5px;
+  font-weight: 700;
+}
+
+.rol-texto small {
+  color: var(--texto-3);
+}
+
+.usuarios {
+  font-size: 12px;
+  color: var(--texto-3);
+  text-align: right;
+}
+
+.usuarios strong {
+  display: block;
+  font-size: 20px;
+  color: var(--texto);
+}
+
+.matriz td:not(:first-child),
+.matriz th:not(:first-child) {
+  text-align: center;
+}
+
+.item-menu {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.item-menu .material-symbols-rounded {
+  font-size: 18px;
+  color: var(--verde);
+}
+
+.lista small {
+  font-size: 12px;
+  color: var(--texto-3);
+}
+
+.acceso-lectura .item-menu .material-symbols-rounded {
+  color: var(--azul);
+}
+
+.acceso-ninguno {
+  opacity: 0.5;
+}
+
+.acceso-ninguno .item-menu .material-symbols-rounded {
+  color: var(--texto-3);
+}
