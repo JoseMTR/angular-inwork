@@ -46,7 +46,7 @@ body {
   font-size: 14px;
   line-height: 1.5;
   color: var(--texto);
-  background: var(--fondo) url('/fondo.svg') center / cover fixed no-repeat;
+  background: #ffffff;
   -webkit-font-smoothing: antialiased;
 }
 
