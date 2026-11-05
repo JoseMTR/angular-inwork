@@ -1,0 +1,40 @@
+<div class="pagina">
+  <app-page-header titulo="Países y ciudades" grupo="Catálogos" descripcion="Los lugares donde se pueden publicar trabajos y registrar usuarios." />
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Cargando países y ciudades" /></div>
+  } @else {
+    <div class="rejilla c-3">
+      <app-stat-card [dato]="{ titulo: 'Países', valor: d().paises.length, icono: 'public', color: 'azul', detalle: 'registrados' }" />
+      <app-stat-card [dato]="{ titulo: 'Ciudades', valor: d().ciudades.length, icono: 'location_city', color: 'verde', detalle: 'disponibles' }" />
+      <app-stat-card [dato]="{ titulo: 'Ciudad con más trabajos', valor: ciudadTop(), icono: 'trending_up', color: 'naranja', detalle: 'según los trabajos publicados' }" />
+    </div>
+
+    <div class="rejilla c-2">
+      <app-crud-catalogo
+        titulo="Países"
+        [subtitulo]="d().paises.length + ' países'"
+        singular="País"
+        [datos]="d().paises"
+        [columnas]="columnasPaises"
+        [campos]="camposPais"
+        ruta="/paises/"
+        clave="id_pais"
+        modulo="ubicacion"
+        [alCambiar]="cargar"
+      />
+      <app-crud-catalogo
+        titulo="Ciudades"
+        [subtitulo]="d().ciudades.length + ' ciudades'"
+        singular="Ciudad"
+        [datos]="d().ciudades"
+        [columnas]="columnasCiudades"
+        [campos]="camposCiudad()"
+        ruta="/ciudades/"
+        clave="id_ciudad"
+        modulo="ubicacion"
+        [alCambiar]="cargar"
+      />
+    </div>
+  }
+</div>

@@ -1,0 +1,91 @@
+<div class="pagina">
+  <app-page-header titulo="Chats y mensajes" grupo="Moderación" descripcion="Conversaciones entre clientes y trabajadores. Úsalas cuando haya un reporte o una disputa." />
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Cargando conversaciones" /></div>
+  } @else {
+    <div class="espacio">
+      <aside class="lista-chats vidrio">
+        <label class="buscar">
+          <span class="material-symbols-rounded">search</span>
+          <input type="search" placeholder="Buscar por usuario o trabajo" [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" />
+        </label>
+        <span class="texto-3 texto-chico">{{ chats().length }} conversaciones</span>
+        <ul class="chats">
+          @for (chat of chats(); track chat.id_chat) {
+            <li>
+              <button type="button" class="chat" [class.activo]="chat.id_chat === seleccionado()?.id_chat" (click)="elegir(chat)">
+                <app-avatar [nombre]="nombre(chat.id_trabajador)" />
+                <span class="chat-texto">
+                  <span class="chat-fila">
+                    <strong>{{ trabajo(chat.id_trabajo) }}</strong>
+                    <span class="hora">{{ chat.ultimo ? f.haceCuanto(chat.ultimo.created) : '' }}</span>
+                  </span>
+                  <small>{{ nombre(chat.id_cliente) }} y {{ nombre(chat.id_trabajador) }}</small>
+                  <span class="ultimo">{{ chat.ultimo?.mensaje ?? 'Sin mensajes' }}</span>
+                  @if (chat.reporte) {
+                    <span class="etiqueta-reporte">
+                      <span class="material-symbols-rounded">flag</span>
+                      Con reporte
+                    </span>
+                  }
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+      </aside>
+
+      @if (seleccionado(); as sel) {
+        <section class="conversacion vidrio">
+          <header class="conversacion-cabecera">
+            <div>
+              <h2>{{ trabajo(sel.id_trabajo) }}</h2>
+              <span class="texto-2">{{ nombre(sel.id_cliente) }} (cliente) y {{ nombre(sel.id_trabajador) }} (trabajador)</span>
+            </div>
+            <div class="acciones">
+              @if (sel.reporte && sesion.permiso('reportes')) {
+                <button class="boton boton-peligro boton-pequeno" type="button" (click)="verReporte()">
+                  <span class="material-symbols-rounded">flag</span>
+                  Ver reporte
+                </button>
+              }
+              @if (sesion.permiso('trabajos')) {
+                <button class="boton boton-claro boton-pequeno" type="button" (click)="verTrabajo()">
+                  <span class="material-symbols-rounded">work</span>
+                  Ver trabajo
+                </button>
+              }
+            </div>
+          </header>
+
+          <div class="aviso">
+            <span class="material-symbols-rounded">visibility</span>
+            Modo solo lectura. El equipo de InWork puede leer este chat, pero no escribir en él.
+          </div>
+
+          <div class="mensajes">
+            @if (cargandoMensajes()) {
+              <p class="texto-3">Cargando mensajes...</p>
+            } @else if (mensajes().length === 0) {
+              <p class="texto-3">Esta conversación no tiene mensajes.</p>
+            } @else {
+              @for (mensaje of mensajes(); track mensaje.id_mensaje) {
+                <app-chat-bubble [autor]="nombre(mensaje.id_remitente)" [hora]="f.fechaHora(mensaje.created)" [propio]="mensaje.id_remitente === sel.id_trabajador">
+                  {{ mensaje.mensaje }}
+                </app-chat-bubble>
+              }
+            }
+          </div>
+
+          <footer class="pie">
+            <span class="material-symbols-rounded">lock</span>
+            No se pueden enviar mensajes desde el panel.
+          </footer>
+        </section>
+      } @else {
+        <div class="vidrio"><app-empty-state icono="forum" titulo="Sin conversaciones" texto="Cuando un cliente y un trabajador hablen aparecerá aquí." /></div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,7 @@
+<footer class="pie-panel">
+  <span>© {{ anio }} InWork · Panel de administración · Hecho con Angular</span>
+  <div class="estados">
+    <span [class]="'estado ' + clase(estado().principal)"><i></i>API principal</span>
+    <span [class]="'estado ' + clase(estado().pagos)"><i></i>API de pagos</span>
+  </div>
+</footer>

@@ -1,0 +1,131 @@
+<div class="pagina">
+  <app-page-header titulo="Mi perfil" grupo="Sistema" descripcion="Los datos de la cuenta con la que iniciaste sesión." />
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Cargando tu perfil" /></div>
+  } @else if (!yo()) {
+    <div class="vidrio vacio-perfil">No se pudo cargar tu perfil. Revisa tu conexión y recarga la página.</div>
+  } @else {
+    <div class="rejilla perfil">
+      <section class="tarjeta-perfil vidrio">
+        <div class="portada"></div>
+        <div class="identidad">
+          <app-avatar [nombre]="f.nombreCompleto(yo())" tamano="grande" />
+          <h2>{{ f.nombreCompleto(yo()) }}</h2>
+          <span class="texto-2">{{ yo().correo }}</span>
+          <span class="rol">
+            <span class="material-symbols-rounded">{{ iconosRol[yo().id_rol] ?? 'badge' }}</span>
+            {{ yo().rol }}
+          </span>
+        </div>
+        <ul class="lista">
+          <li><span class="texto-3">Teléfono</span><strong>{{ yo().telefono ?? '—' }}</strong></li>
+          <li><span class="texto-3">Ciudad</span><strong>{{ nombreCiudad() }}</strong></li>
+          <li><span class="texto-3">Documento</span><strong>{{ f.capitalizar(yo().tipo_identificacion ?? '') }} {{ yo().numero_identificacion }}</strong></li>
+          <li><span class="texto-3">Correo verificado</span><strong>{{ yo().correo_verificado ? 'Sí' : 'No' }}</strong></li>
+          <li><span class="texto-3">Miembro desde</span><strong>{{ f.fecha(yo().created) }}</strong></li>
+          <li><span class="texto-3">Sesión iniciada</span><strong>{{ sesion.sesion()?.inicio ? f.fechaHora(sesion.sesion()?.inicio) : '—' }}</strong></li>
+        </ul>
+        <button class="boton boton-peligro boton-bloque" type="button" (click)="salir()">
+          <span class="material-symbols-rounded">logout</span>
+          Cerrar sesión
+        </button>
+      </section>
+
+      <div class="formularios">
+        <app-tarjeta
+          titulo="Datos personales"
+          [subtitulo]="puedeEditar() ? 'El correo y el rol solo los cambia un administrador' : 'Tu rol puede ver estos datos pero no editarlos'"
+        >
+          <form class="rejilla c-2 formulario" (ngSubmit)="guardarDatos()">
+            <div class="campo"><label for="p-nombre">Nombre</label><input id="p-nombre" name="nombre" class="entrada" [(ngModel)]="form.nombre" [disabled]="!puedeEditar()" /></div>
+            <div class="campo"><label for="p-apellido">Apellido</label><input id="p-apellido" name="apellido" class="entrada" [(ngModel)]="form.apellido" [disabled]="!puedeEditar()" /></div>
+            <div class="campo"><label for="p-correo">Correo</label><input id="p-correo" class="entrada" type="email" [value]="yo().correo" disabled /></div>
+            <div class="campo">
+              <label for="p-telefono">Teléfono</label>
+              <input id="p-telefono" name="telefono" class="entrada" type="tel" inputmode="numeric" maxlength="10" [(ngModel)]="form.telefono" [disabled]="!puedeEditar()" />
+            </div>
+            <div class="campo">
+              <label for="p-ciudad">Ciudad</label>
+              <select id="p-ciudad" name="id_ciudad" class="entrada" [(ngModel)]="form.id_ciudad" [disabled]="!puedeEditar()">
+                <option [ngValue]="null">Sin ciudad</option>
+                @for (ciudad of ciudades(); track ciudad.id_ciudad) {
+                  <option [ngValue]="ciudad.id_ciudad">{{ ciudad.nombre }}</option>
+                }
+              </select>
+            </div>
+            <div class="campo"><label for="p-rol">Rol</label><input id="p-rol" class="entrada" [value]="yo().rol" disabled /></div>
+            <div class="campo ancho">
+              <label for="p-direccion">Dirección</label>
+              <input id="p-direccion" name="direccion" class="entrada" [(ngModel)]="form.direccion" [disabled]="!puedeEditar()" placeholder="Calle 72 #45-10, Barranquilla" />
+            </div>
+            <div class="campo ancho">
+              <label for="p-descripcion">Sobre mí</label>
+              <textarea id="p-descripcion" name="descripcion" class="entrada" [(ngModel)]="form.descripcion" [disabled]="!puedeEditar()"></textarea>
+            </div>
+            @if (errorDatos()) {
+              <p class="error-campo ancho"><span class="material-symbols-rounded">error</span>{{ errorDatos() }}</p>
+            }
+            @if (puedeEditar()) {
+              <div class="guardar ancho">
+                <button class="boton boton-claro" type="button" (click)="llenarFormulario()" [disabled]="!hayCambios()">Descartar</button>
+                <button class="boton boton-primario" type="submit" [disabled]="!hayCambios() || guardandoDatos()">
+                  <span class="material-symbols-rounded">save</span>
+                  {{ guardandoDatos() ? 'Guardando...' : 'Guardar cambios' }}
+                </button>
+              </div>
+            } @else {
+              <p class="solo-lectura ancho"><span class="material-symbols-rounded">lock</span>Para cambiar tus datos pídeselo a un administrador.</p>
+            }
+          </form>
+        </app-tarjeta>
+
+        <app-tarjeta titulo="Cambiar contraseña" subtitulo="Mínimo 8 caracteres">
+          <form class="formulario" (ngSubmit)="cambiarClave()">
+            <div class="rejilla c-3 formulario">
+              <div class="campo">
+                <label for="c-actual">Contraseña actual</label>
+                <input id="c-actual" name="actual" class="entrada" type="password" autocomplete="current-password" [(ngModel)]="clave.actual" placeholder="••••••••" />
+              </div>
+              <div class="campo">
+                <label for="c-nueva">Nueva contraseña</label>
+                <input id="c-nueva" name="nueva" class="entrada" type="password" autocomplete="new-password" [(ngModel)]="clave.nueva" placeholder="Mínimo 8 caracteres" />
+              </div>
+              <div class="campo">
+                <label for="c-confirmar">Confirmar</label>
+                <input id="c-confirmar" name="confirmar" class="entrada" type="password" autocomplete="new-password" [(ngModel)]="clave.confirmar" placeholder="Repite la nueva" />
+              </div>
+            </div>
+            @if (errorClave()) {
+              <p class="error-campo"><span class="material-symbols-rounded">error</span>{{ errorClave() }}</p>
+            }
+            <div class="guardar">
+              <button class="boton boton-claro" type="submit" [disabled]="guardandoClave()">
+                <span class="material-symbols-rounded">key</span>
+                {{ guardandoClave() ? 'Actualizando...' : 'Actualizar contraseña' }}
+              </button>
+            </div>
+          </form>
+        </app-tarjeta>
+
+        <app-tarjeta titulo="Mis permisos" subtitulo="Lo que tu rol puede hacer en cada módulo (tabla rol_modulo)">
+          <ul class="lista permisos">
+            @for (modulo of misModulos(); track modulo.nombre) {
+              <li>
+                <a class="modulo" [routerLink]="modulo.ruta">
+                  <span class="material-symbols-rounded">{{ modulo.info.icono }}</span>
+                  {{ modulo.info.texto }}
+                </a>
+                <span class="acciones">
+                  @for (accion of acciones; track accion.campo) {
+                    <span class="permiso" [class.si]="tiene(modulo, accion.campo)">{{ accion.texto }}</span>
+                  }
+                </span>
+              </li>
+            }
+          </ul>
+        </app-tarjeta>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,77 @@
+<div class="pagina">
+  <app-page-header titulo="Ofertas" grupo="Marketplace" descripcion="Las propuestas que los trabajadores envían a cada trabajo publicado.">
+    @if (!sesion.permiso('ofertas', 'eliminar')) {
+      <span class="solo-lectura"><span class="material-symbols-rounded">visibility</span>Solo lectura</span>
+    }
+  </app-page-header>
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Cargando ofertas" /></div>
+  } @else {
+    <div class="rejilla c-4">
+      @for (dato of resumen(); track dato.titulo) {
+        <app-stat-card [dato]="dato" />
+      }
+    </div>
+
+    <app-tarjeta titulo="Ofertas recibidas" subtitulo="Comparadas con el presupuesto que puso el cliente">
+      <app-tabla-datos
+        [datos]="d().ofertas"
+        [columnas]="columnas"
+        [acciones]="accionesTabla()"
+        [alSeleccionar]="elegir"
+        [seleccionado]="seleccionada()"
+        clave="id_oferta"
+        [orden]="[[4, 'desc']]"
+      />
+    </app-tarjeta>
+
+    @if (seleccionada(); as sel) {
+      <app-tarjeta titulo="Oferta seleccionada" [subtitulo]="'Enviada el ' + f.fechaHora(sel.fecha_oferta)">
+        <app-status-pill acciones [estado]="sel.estado_oferta" />
+        <div class="oferta">
+          <div class="celda-persona">
+            <app-avatar [nombre]="nombre(sel.id_trabajador)" />
+            <div>
+              <strong>{{ nombre(sel.id_trabajador) }}</strong>
+              <small>{{ detalleTrabajador() }}</small>
+            </div>
+          </div>
+
+          <div class="comparar">
+            <div class="dato-mini">
+              <span>Ofertó</span>
+              <strong>{{ f.moneda(sel.valor_oferta) }}</strong>
+            </div>
+            <div class="dato-mini">
+              <span>Presupuesto</span>
+              <strong>{{ f.moneda(presupuesto(sel)) }}</strong>
+            </div>
+          </div>
+
+          <div>
+            <span class="subtitulo-seccion">Trabajo</span>
+            <p class="fuerte">{{ trabajo(sel.id_trabajo)?.titulo ?? 'Trabajo' }}</p>
+            <small class="texto-3">Cliente: {{ nombre(trabajo(sel.id_trabajo)?.id_cliente) }}</small>
+          </div>
+
+          <div>
+            <span class="subtitulo-seccion">Mensaje completo</span>
+            <blockquote>{{ sel.mensaje ?? 'El trabajador no escribió mensaje.' }}</blockquote>
+          </div>
+
+          <div class="acciones">
+            @if (sesion.permiso('trabajos')) {
+              <button class="boton boton-claro boton-pequeno" type="button" (click)="verTrabajo()">
+                <span class="material-symbols-rounded">work</span>
+                Ver trabajo
+              </button>
+            }
+          </div>
+        </div>
+      </app-tarjeta>
+    }
+  }
+</div>
+
+<app-confirmar [(abierto)]="confirmar" titulo="Eliminar oferta" [texto]="textoConfirmar()" textoBoton="Eliminar" [alConfirmar]="eliminar" />

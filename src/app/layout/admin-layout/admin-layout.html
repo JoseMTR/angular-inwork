@@ -1,0 +1,16 @@
+<div class="marco">
+  <app-sidebar [grupos]="grupos()" [usuario]="sesion.sesion()" [insignias]="insignias()" [(abierto)]="menuAbierto" (salir)="salir()" />
+  <div class="zona">
+    <app-topbar
+      [grupos]="grupos()"
+      [noLeidas]="noLeidas()"
+      [verNotificaciones]="sesion.permiso('notificaciones')"
+      [verInformes]="sesion.permiso('informes')"
+      (abrirMenu)="menuAbierto.set(true)"
+    />
+    <main class="contenido">
+      <router-outlet />
+    </main>
+    <app-footer />
+  </div>
+</div>

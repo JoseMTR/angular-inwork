@@ -1,0 +1,122 @@
+:host {
+  display: contents;
+}
+
+.superior {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  border-radius: 22px;
+}
+.hamburguesa {
+  display: none;
+}
+.buscar {
+  position: relative;
+  flex: 1 1 320px;
+  max-width: 460px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid var(--linea);
+  color: var(--texto-3);
+}
+.buscar input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 13.5px;
+  color: var(--texto);
+}
+kbd {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 7px;
+  border-radius: 7px;
+  border: 1px solid var(--linea-fuerte);
+  background: #fff;
+  color: var(--texto-3);
+}
+.sugerencias {
+  position: absolute;
+  top: 48px;
+  left: 0;
+  right: 0;
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.97);
+}
+.sugerencias button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto-2);
+  text-align: left;
+  cursor: pointer;
+}
+.sugerencias button:hover {
+  background: var(--naranja-suave);
+  color: var(--texto);
+}
+.derecha {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.campana {
+  position: relative;
+}
+.campana .punto {
+  position: absolute;
+  top: 4px;
+  right: 3px;
+  display: grid;
+  place-items: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #fff;
+  background: var(--naranja);
+  border: 2px solid #fff;
+}
+@media (max-width: 760px) {
+  .hamburguesa {
+    display: inline-flex;
+  }
+  .superior {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .buscar {
+    order: 3;
+    flex-basis: 100%;
+    max-width: none;
+  }
+  kbd,
+  .texto-boton {
+    display: none;
+  }
+}

@@ -1,0 +1,145 @@
+<div class="pagina">
+  <app-page-header titulo="Verificación de identidad" grupo="Personas" descripcion="Compara el documento con la selfie y confirma que cada persona es quien dice ser.">
+    @if (!puedeRevisar()) {
+      <span class="solo-lectura"><span class="material-symbols-rounded">visibility</span>Solo lectura</span>
+    }
+  </app-page-header>
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Cargando solicitudes" /></div>
+  } @else {
+    <div class="rejilla c-3">
+      @for (dato of resumen(); track dato.titulo) {
+        <app-stat-card [dato]="dato" />
+      }
+    </div>
+
+    <div class="rejilla revision">
+      <app-tarjeta titulo="Solicitudes" subtitulo="Ordenadas de la más antigua a la más reciente">
+        <div class="segmentado filtros">
+          @for (opcion of filtros; track opcion) {
+            <button type="button" class="segmento" [class.activo]="opcion === filtro()" (click)="filtro.set(opcion)">{{ opcion }}</button>
+          }
+        </div>
+        @if (lista().length === 0) {
+          <p class="texto-3 vacio">No hay solicitudes {{ filtro().toLowerCase() }}.</p>
+        } @else {
+          <ul class="solicitudes">
+            @for (solicitud of lista(); track solicitud.id_verificacion) {
+              <li>
+                <button type="button" class="solicitud" [class.activa]="solicitud.id_verificacion === seleccionada()?.id_verificacion" (click)="elegir(solicitud)">
+                  <app-avatar [nombre]="nombre(solicitud.id_usuario)" tamano="chico" />
+                  <span class="solicitud-texto">
+                    <strong>{{ nombre(solicitud.id_usuario) }}</strong>
+                    <small>{{ f.fechaHora(solicitud.created) }}</small>
+                  </span>
+                  <app-status-pill [estado]="solicitud.estado_verificacion" />
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </app-tarjeta>
+
+      @if (seleccionada(); as sel) {
+        <app-tarjeta titulo="Revisión" [subtitulo]="'Enviada el ' + f.fechaHora(sel.created)">
+          <div class="documentos">
+            @for (doc of documentos; track doc.campo) {
+              <figure class="documento" [class.selfie]="doc.campo === 'url_selfie'">
+                @if (sel[doc.campo] && !fotosFallidas()[doc.campo]) {
+                  <img [src]="sel[doc.campo]" [alt]="doc.texto" (error)="fotoFallo(doc.campo)" />
+                } @else {
+                  <div class="imagen-falsa">
+                    <span class="material-symbols-rounded">{{ doc.icono }}</span>
+                    {{ sel[doc.campo] ? 'No se pudo cargar la imagen' : 'No enviado' }}
+                  </div>
+                }
+                <figcaption>
+                  {{ doc.texto }}
+                  @if (sel[doc.campo]) {
+                    <a [href]="sel[doc.campo]" target="_blank" rel="noopener noreferrer">Abrir</a>
+                  }
+                </figcaption>
+              </figure>
+            }
+          </div>
+
+          <div class="datos">
+            <div class="celda-persona">
+              <app-avatar [nombre]="nombre(sel.id_usuario)" />
+              <div>
+                <strong>{{ nombre(sel.id_usuario) }}</strong>
+                <small>{{ usuarioSel()?.correo ?? '' }}</small>
+              </div>
+              <span class="espacio"></span>
+              <app-status-pill [estado]="sel.estado_verificacion" />
+            </div>
+            <dl class="detalle">
+              <div><dt>Tipo de documento</dt><dd>{{ f.capitalizar(usuarioSel()?.tipo_identificacion ?? '—') }}</dd></div>
+              <div><dt>Número</dt><dd>{{ usuarioSel()?.numero_identificacion ?? '—' }}</dd></div>
+              <div><dt>Ciudad</dt><dd>{{ usuarioSel()?.ciudad ?? '—' }}</dd></div>
+              <div><dt>Intentos</dt><dd>{{ historial().length }}</dd></div>
+              @if (sel.id_admin_revisor) {
+                <div><dt>Revisó</dt><dd>{{ nombre(sel.id_admin_revisor) }}</dd></div>
+                <div><dt>Fecha de revisión</dt><dd>{{ f.fechaHora(sel.fecha_revision) }}</dd></div>
+              }
+            </dl>
+          </div>
+
+          @if (puedeRevisar()) {
+            <div class="campo">
+              <label for="observacion">Observación</label>
+              <textarea id="observacion" class="entrada" placeholder="Escribe el motivo si vas a rechazar la solicitud" [(ngModel)]="observacion"></textarea>
+              <span class="ayuda">Es obligatoria cuando se rechaza.</span>
+            </div>
+            @if (error()) {
+              <p class="error-campo"><span class="material-symbols-rounded">error</span>{{ error() }}</p>
+            }
+            <div class="acciones decision">
+              <button class="boton boton-peligro" type="button" [disabled]="guardando()" (click)="revisar('rechazada')">
+                <span class="material-symbols-rounded">close</span>
+                Rechazar
+              </button>
+              <button class="boton boton-primario" type="button" [disabled]="guardando()" (click)="revisar('aprobada')">
+                <span class="material-symbols-rounded">check</span>
+                {{ guardando() ? 'Guardando...' : 'Aprobar identidad' }}
+              </button>
+            </div>
+          } @else if (sel.observacion) {
+            <div class="campo">
+              <span class="etiqueta">Observación</span>
+              <p class="texto-2">{{ sel.observacion }}</p>
+            </div>
+          }
+
+          <div class="separador"></div>
+
+          <span class="subtitulo-seccion">Historial de este usuario</span>
+          <ul class="linea-tiempo">
+            @for (registro of historial(); track registro.id_verificacion) {
+              <li [class]="registro.estado_verificacion === 'pendiente' ? 'actual' : 'hecho'">
+                <strong>{{ f.fecha(registro.created) }}, {{ f.textoEstado(registro.estado_verificacion).toLowerCase() }}</strong>
+                <small>{{ registro.observacion ?? 'Sin observaciones' }}</small>
+              </li>
+            }
+          </ul>
+        </app-tarjeta>
+      } @else {
+        <div class="vidrio">
+          <app-empty-state icono="badge" titulo="Sin solicitudes" texto="Cuando alguien envíe sus documentos aparecerá aquí." />
+        </div>
+      }
+    </div>
+
+    <app-tarjeta titulo="Todas las verificaciones" subtitulo="Historial completo con su revisión">
+      <app-tabla-datos
+        [datos]="d().verificaciones"
+        [columnas]="columnas"
+        [alSeleccionar]="elegir"
+        [seleccionado]="seleccionada()"
+        clave="id_verificacion"
+        [orden]="[[3, 'desc']]"
+      />
+    </app-tarjeta>
+  }
+</div>

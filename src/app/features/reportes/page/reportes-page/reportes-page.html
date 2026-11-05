@@ -1,0 +1,135 @@
+<div class="pagina">
+  <app-page-header titulo="Reportes" grupo="Moderación" descripcion="Las denuncias entre usuarios y cómo las resuelve el equipo de moderación.">
+    @if (!puedeGestionar()) {
+      <span class="solo-lectura"><span class="material-symbols-rounded">visibility</span>Solo lectura</span>
+    }
+  </app-page-header>
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Cargando reportes" /></div>
+  } @else {
+    <div class="rejilla c-4">
+      @for (dato of resumen(); track dato.titulo) {
+        <app-stat-card [dato]="dato" />
+      }
+    </div>
+
+    <app-tarjeta titulo="Denuncias" subtitulo="Haz clic en una para revisarla">
+      <app-tabla-datos [datos]="d().reportes" [columnas]="columnas" [alSeleccionar]="elegir" [seleccionado]="seleccionado()" clave="id_reporte" [orden]="[[5, 'desc']]" />
+    </app-tarjeta>
+
+    @if (seleccionado(); as sel) {
+      <app-tarjeta [titulo]="motivo(sel.motivo) + ': ' + trabajo(sel.id_trabajo)" [subtitulo]="'Enviado el ' + f.fechaHora(sel.created)">
+        <div class="reporte">
+          <div class="partes">
+            <div class="celda-persona">
+              <app-avatar [nombre]="nombre(sel.id_reportante)" tamano="chico" />
+              <div>
+                <small>Reporta</small>
+                <strong>{{ nombre(sel.id_reportante) }}</strong>
+              </div>
+            </div>
+            <span class="material-symbols-rounded">arrow_forward</span>
+            <div class="celda-persona">
+              <app-avatar [nombre]="nombre(sel.id_reportado)" tamano="chico" />
+              <div>
+                <small>Reportado</small>
+                <strong>{{ nombre(sel.id_reportado) }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <span class="subtitulo-seccion">Descripción</span>
+            <p class="texto-2 descripcion">{{ sel.descripcion }}</p>
+          </div>
+
+          @if (sesion.permiso('adjuntos')) {
+            <div>
+              <span class="subtitulo-seccion">Evidencias</span>
+              @if (evidencias().length) {
+                <div class="evidencias">
+                  @for (evidencia of evidencias(); track evidencia.id_adjunto) {
+                    <a class="imagen-falsa" [href]="evidencia.url" target="_blank" rel="noopener noreferrer">
+                      <span class="material-symbols-rounded">{{ evidencia.tipo_mime?.startsWith('image') ? 'screenshot' : 'description' }}</span>
+                      Abrir evidencia
+                    </a>
+                  }
+                </div>
+              } @else {
+                <p class="texto-3 texto-chico">No adjuntó evidencias.</p>
+              }
+            </div>
+          }
+
+          <dl class="detalle">
+            <div><dt>Revisor asignado</dt><dd>{{ sel.id_admin_revisor ? nombre(sel.id_admin_revisor) : 'Sin asignar' }}</dd></div>
+            <div><dt>Estado</dt><dd><app-status-pill [estado]="sel.estado_reporte" /></dd></div>
+          </dl>
+
+          <div>
+            <span class="subtitulo-seccion">Historial</span>
+            <ul class="linea-tiempo">
+              @for (paso of historial(); track $index) {
+                <li [class]="paso.estado">
+                  <strong>{{ paso.titulo }}</strong>
+                  <small>{{ paso.fecha }}</small>
+                </li>
+              }
+            </ul>
+          </div>
+
+          @if (puedeGestionar()) {
+            <div class="campo">
+              <label for="resolucion">Resolución</label>
+              <textarea id="resolucion" name="resolucion" class="entrada" placeholder="Explica qué se decidió y por qué" [(ngModel)]="resolucion"></textarea>
+            </div>
+            @if (error()) {
+              <p class="error-campo"><span class="material-symbols-rounded">error</span>{{ error() }}</p>
+            }
+            <div class="acciones">
+              @if (sel.estado_reporte === 'pendiente') {
+                <button class="boton boton-claro boton-pequeno" type="button" [disabled]="guardando()" (click)="cambiarEstado('en_revision')">
+                  <span class="material-symbols-rounded">front_hand</span>
+                  Tomar reporte
+                </button>
+              }
+              <button class="boton boton-exito boton-pequeno" type="button" [disabled]="guardando()" (click)="cambiarEstado('resuelto')">
+                <span class="material-symbols-rounded">gavel</span>
+                Resolver
+              </button>
+              <button class="boton boton-claro boton-pequeno" type="button" [disabled]="guardando()" (click)="cambiarEstado('rechazado')">
+                <span class="material-symbols-rounded">close</span>
+                Rechazar
+              </button>
+            </div>
+          } @else if (sel.resolucion) {
+            <div>
+              <span class="subtitulo-seccion">Resolución</span>
+              <p class="texto-2">{{ sel.resolucion }}</p>
+            </div>
+          }
+
+          <div class="acciones">
+            @if (sesion.permiso('chat')) {
+              <button class="boton boton-suave boton-pequeno" type="button" (click)="abrirChat()">
+                <span class="material-symbols-rounded">forum</span>
+                Abrir chat del trabajo
+              </button>
+            }
+            @if (sesion.permiso('usuarios', 'eliminar') && sesion.esAdmin()) {
+              <button class="boton boton-peligro boton-pequeno" type="button" (click)="confirmarSuspender.set(true)">
+                <span class="material-symbols-rounded">block</span>
+                Suspender a {{ nombre(sel.id_reportado) }}
+              </button>
+            }
+          </div>
+        </div>
+      </app-tarjeta>
+    } @else {
+      <div class="vidrio"><app-empty-state icono="flag" titulo="Sin reportes" texto="Cuando alguien denuncie a otro usuario aparecerá aquí." /></div>
+    }
+  }
+</div>
+
+<app-confirmar [(abierto)]="confirmarSuspender" titulo="Suspender cuenta" [texto]="textoSuspender()" textoBoton="Suspender" [alConfirmar]="suspender" />

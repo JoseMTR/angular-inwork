@@ -1,0 +1,12 @@
+<main class="error-pagina">
+  <section class="vidrio caja">
+    <span class="icono"><span class="material-symbols-rounded">travel_explore</span></span>
+    <strong class="codigo-error">404</strong>
+    <h1>Esta página no existe</h1>
+    <p class="texto-2">Revisa la dirección o vuelve al panel desde el menú.</p>
+    <a class="boton boton-primario" [routerLink]="sesion.sesion() ? '/inicio' : '/'">
+      <span class="material-symbols-rounded">{{ sesion.sesion() ? 'dashboard' : 'login' }}</span>
+      {{ sesion.sesion() ? 'Volver al inicio' : 'Ir al inicio de sesión' }}
+    </a>
+  </section>
+</main>

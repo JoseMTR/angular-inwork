@@ -1,0 +1,76 @@
+<div class="pagina">
+  <app-page-header titulo="Archivos adjuntos" grupo="Moderación" descripcion="Fotos de los trabajos, pruebas de los reportes y archivos enviados por chat.">
+    @if (sesion.permiso('adjuntos', 'crear')) {
+      <button class="boton boton-primario" type="button" (click)="abrirNuevo()">
+        <span class="material-symbols-rounded">upload_file</span>
+        Registrar archivo
+      </button>
+    }
+  </app-page-header>
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Cargando archivos" /></div>
+  } @else {
+    <div class="rejilla c-3">
+      @for (dato of resumen(); track dato.titulo) {
+        <app-stat-card [dato]="dato" />
+      }
+    </div>
+
+    <app-tarjeta titulo="Archivos" subtitulo="Usa el botón abrir para ver cada archivo">
+      <app-tabla-datos [datos]="d().adjuntos" [columnas]="columnas" [acciones]="acciones()" [orden]="[[3, 'desc']]" vacio="No hay archivos adjuntos" />
+    </app-tarjeta>
+  }
+</div>
+
+<app-modal
+  [(abierto)]="modal"
+  [titulo]="editando() ? 'Editar archivo' : 'Registrar archivo'"
+  subtitulo="El archivo debe estar subido en internet (por ejemplo Cloudinary o Google Drive)"
+  ancho="560px"
+>
+  <form id="form-adjunto" class="campos" (ngSubmit)="guardar()">
+    <div class="rejilla c-2">
+      <div class="campo">
+        <label for="a-entidad">Pertenece a</label>
+        <select id="a-entidad" name="tipo_entidad" class="entrada" [(ngModel)]="form.tipo_entidad" (ngModelChange)="cambiarEntidad()">
+          @for (entidad of entidades; track entidad.valor) {
+            <option [value]="entidad.valor">{{ entidad.texto }}</option>
+          }
+        </select>
+      </div>
+      <div class="campo">
+        <label for="a-mime">Tipo de archivo</label>
+        <select id="a-mime" name="tipo_mime" class="entrada" [(ngModel)]="form.tipo_mime">
+          @for (tipo of tiposMime; track tipo.valor) {
+            <option [value]="tipo.valor">{{ tipo.texto }}</option>
+          }
+        </select>
+      </div>
+    </div>
+    <div class="campo">
+      <label for="a-registro">{{ nombresEntidad[form.tipo_entidad] ?? 'Registro' }}</label>
+      <select id="a-registro" name="id_entidad" class="entrada" [(ngModel)]="form.id_entidad">
+        @for (opcion of opcionesEntidad()[form.tipo_entidad] ?? []; track opcion.valor) {
+          <option [ngValue]="opcion.valor">{{ opcion.texto }}</option>
+        }
+      </select>
+    </div>
+    <div class="campo">
+      <label for="a-url">Dirección del archivo</label>
+      <input id="a-url" name="url" class="entrada" [(ngModel)]="form.url" placeholder="https://res.cloudinary.com/inwork/foto.jpg" />
+    </div>
+    @if (errorForm()) {
+      <p class="error-campo"><span class="material-symbols-rounded">error</span>{{ errorForm() }}</p>
+    }
+  </form>
+  <ng-container ngProjectAs="[pie]">
+    <button class="boton boton-claro" type="button" (click)="modal.set(false)">Cancelar</button>
+    <button class="boton boton-primario" type="submit" form="form-adjunto" [disabled]="guardando()">
+      <span class="material-symbols-rounded">save</span>
+      {{ guardando() ? 'Guardando...' : 'Guardar' }}
+    </button>
+  </ng-container>
+</app-modal>
+
+<app-confirmar [(abierto)]="confirmar" titulo="Eliminar archivo" [texto]="textoConfirmar()" textoBoton="Eliminar" [alConfirmar]="eliminar" />

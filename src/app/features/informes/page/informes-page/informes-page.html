@@ -1,0 +1,141 @@
+<div class="pagina">
+  <app-page-header titulo="Informes" grupo="General" descripcion="Se generan solos con los datos reales de InWork. Elige el periodo y descárgalos en PDF o Excel.">
+    <div class="segmentado no-imprimir" role="tablist" aria-label="Periodo del informe">
+      @for (p of periodos; track p.clave) {
+        <button type="button" role="tab" [attr.aria-selected]="p.clave === periodo()" class="segmento" [class.activo]="p.clave === periodo()" (click)="periodo.set(p.clave)">
+          {{ p.texto }}
+        </button>
+      }
+    </div>
+    <button class="boton boton-claro no-imprimir" type="button" (click)="cargar(true)" [disabled]="cargando()" title="Volver a leer los datos">
+      <span class="material-symbols-rounded">refresh</span>
+      Actualizar
+    </button>
+  </app-page-header>
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Armando el informe" /></div>
+  } @else {
+    <div class="rejilla c-lateral informe-rejilla">
+      <div class="columna">
+        <article class="informe vidrio elegido">
+          <header class="informe-cabecera">
+            <span class="informe-icono"><span class="material-symbols-rounded">description</span></span>
+            <div class="informe-titulo">
+              <h3>Informe de {{ elegido().frase }}</h3>
+              <small>Generado el {{ f.fechaHora(generado()) }} por {{ sesion.sesion()?.nombre }}</small>
+            </div>
+            <app-status-pill estado="activo" texto="Listo" />
+          </header>
+          <p class="resumen">{{ narrativa() }}</p>
+          @if (cifras().length) {
+            <div class="rejilla c-3 cifras">
+              @for (cifra of cifras(); track cifra.etiqueta) {
+                <div class="dato-mini">
+                  <span>{{ cifra.etiqueta }}</span>
+                  <strong>{{ cifra.valor }}</strong>
+                  @if (cifra.variacion) {
+                    <em class="cambio" [class.sube]="cifra.sube" [class.baja]="!cifra.sube">{{ cifra.variacion }}</em>
+                  }
+                </div>
+              }
+            </div>
+          }
+          <div class="acciones no-imprimir">
+            <button class="boton boton-claro boton-pequeno" type="button" (click)="imprimir()">
+              <span class="material-symbols-rounded">picture_as_pdf</span>
+              Descargar PDF
+            </button>
+            <button class="boton boton-claro boton-pequeno" type="button" (click)="exportar()">
+              <span class="material-symbols-rounded">table_view</span>
+              Excel
+            </button>
+          </div>
+        </article>
+
+        <app-tarjeta
+          titulo="Actividad"
+          [subtitulo]="'Trabajos, ofertas y contrataciones registrados ' + (periodo() === 'hoy' ? 'por hora' : periodo() === '7' ? 'por día' : 'por semana')"
+        >
+          <app-grafico-area [valores]="actividad().valores" [etiquetas]="actividad().etiquetas" />
+        </app-tarjeta>
+
+        <div class="rejilla c-2">
+          <app-tarjeta titulo="Trabajos por categoría" subtitulo="Publicados en el periodo">
+            <app-grafico-barras [barras]="categoriasPeriodo()" [horizontal]="true" />
+          </app-tarjeta>
+          <app-tarjeta titulo="Contrataciones" subtitulo="Estado de las contrataciones del periodo">
+            <app-grafico-dona [segmentos]="contratosPorEstado()" textoCentral="contratos" />
+          </app-tarjeta>
+        </div>
+
+        <app-tarjeta titulo="Resumen por categoría" [subtitulo]="'Cuánto se movió cada categoría ' + elegido().en">
+          <app-tabla-datos [datos]="porCategoria()" [columnas]="columnasCategoria" [orden]="[[1, 'desc']]" vacio="No hubo movimiento en este periodo" />
+        </app-tarjeta>
+      </div>
+
+      <div class="columna">
+        <app-tarjeta titulo="Hallazgos y recomendaciones" subtitulo="Detectados automáticamente en los datos">
+          <ul class="hallazgos">
+            @for (hallazgo of hallazgos(); track $index) {
+              <li [class]="'hallazgo hallazgo-' + hallazgo.tono">
+                <span class="material-symbols-rounded">{{ hallazgo.icono }}</span>
+                {{ hallazgo.texto }}
+              </li>
+            }
+          </ul>
+        </app-tarjeta>
+
+        <section class="asistente vidrio no-imprimir" aria-label="Asistente de informes">
+          <header class="asistente-cabecera">
+            <div>
+              <h2>Asistente de informes</h2>
+              <small>Responde con los datos de {{ elegido().frase }}</small>
+            </div>
+            <span class="chip"><span class="material-symbols-rounded">lock</span>Solo lectura</span>
+          </header>
+
+          <div class="mensajes" #zonaMensajes>
+            <app-chat-bubble autor="Asistente InWork" [hora]="generado() ? f.horaDe(generado()) : ''" [ia]="true">
+              <p>Hola, {{ primerNombre() }}. Pregúntame por comisiones, categorías, trabajadores, reportes, ciudades u ofertas y te respondo con los datos reales.</p>
+            </app-chat-bubble>
+            @for (mensaje of mensajes(); track $index) {
+              <app-chat-bubble [autor]="mensaje.propio ? 'Tú' : 'Asistente InWork'" [hora]="mensaje.hora" [propio]="mensaje.propio" [ia]="!mensaje.propio">
+                <p>{{ mensaje.texto }}</p>
+                @if (mensaje.cifras?.length) {
+                  <div class="cifras-chat">
+                    @for (cifra of mensaje.cifras ?? []; track cifra.etiqueta) {
+                      <div class="dato-mini"><span>{{ cifra.etiqueta }}</span><strong>{{ cifra.valor }}</strong></div>
+                    }
+                  </div>
+                }
+                @if (mensaje.barras?.length) {
+                  <div class="barras-chat">
+                    <app-grafico-barras [barras]="mensaje.barras ?? []" [horizontal]="true" [color]="mensaje.color ?? 'naranja'" [formato]="mensaje.formato ?? formatoNormal" />
+                  </div>
+                }
+              </app-chat-bubble>
+            }
+          </div>
+
+          <div class="sugerencias">
+            @for (sugerencia of sugerencias; track sugerencia) {
+              <button class="chip sugerencia" type="button" (click)="preguntar(sugerencia)">
+                <span class="material-symbols-rounded">auto_awesome</span>
+                {{ sugerencia }}
+              </button>
+            }
+          </div>
+
+          <form class="escribir" (ngSubmit)="preguntar(pregunta)">
+            <input class="entrada" type="text" name="pregunta" [(ngModel)]="pregunta" placeholder="Pregunta algo sobre los datos de InWork" aria-label="Pregunta" />
+            <button class="boton boton-primario boton-icono" type="submit" aria-label="Enviar" [disabled]="!pregunta.trim()">
+              <span class="material-symbols-rounded">send</span>
+            </button>
+          </form>
+          <p class="nota texto-3">Las respuestas se calculan con reglas sobre los datos de la base de datos; no se envía información a servicios externos.</p>
+        </section>
+      </div>
+    </div>
+  }
+</div>

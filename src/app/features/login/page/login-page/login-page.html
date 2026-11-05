@@ -1,0 +1,119 @@
+<div class="login">
+  <section class="marca vidrio">
+    <div class="marca-logo">
+      <span class="logo">
+        <span class="material-symbols-rounded">bolt</span>
+      </span>
+      <div>
+        <strong>InWork</strong>
+        <small>Panel de administración</small>
+      </div>
+    </div>
+
+    <div class="marca-texto">
+      <h1>Toda la plataforma, vista desde un solo lugar.</h1>
+      <p>Revisa usuarios, trabajos, contrataciones y pagos de InWork, atiende reportes y pídele a la IA los informes que necesites.</p>
+    </div>
+
+    <div class="ejemplos">
+      <article class="ejemplo">
+        <span class="ejemplo-icono azul">
+          <span class="material-symbols-rounded">shield_lock</span>
+        </span>
+        <div>
+          <span class="texto-3 texto-chico">Acceso seguro</span>
+          <strong>Token JWT</strong>
+        </div>
+      </article>
+      <article class="ejemplo">
+        <span class="ejemplo-icono verde">
+          <span class="material-symbols-rounded">groups</span>
+        </span>
+        <div>
+          <span class="texto-3 texto-chico">Roles del panel</span>
+          <strong>3 roles</strong>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="formulario vidrio">
+    <div class="formulario-cabecera">
+      <h2>Inicia sesión</h2>
+      <p>Usa la cuenta que te asignó la plataforma.</p>
+    </div>
+
+    <form class="campos" (ngSubmit)="entrar()">
+      <div class="campo">
+        <label for="correo">Correo</label>
+        <div class="entrada-icono">
+          <span class="material-symbols-rounded">mail</span>
+          <input id="correo" name="correo" class="entrada" type="email" placeholder="nombre@inwork.com.co" autocomplete="username" [(ngModel)]="correo" />
+        </div>
+        @if (correo && !correoValido()) {
+          <span class="ayuda negativo">Escribe un correo válido.</span>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="clave">Contraseña</label>
+        <div class="entrada-icono">
+          <span class="material-symbols-rounded">lock</span>
+          <input
+            id="clave"
+            name="clave"
+            class="entrada"
+            [type]="verClave() ? 'text' : 'password'"
+            placeholder="Tu contraseña"
+            autocomplete="current-password"
+            [(ngModel)]="password"
+          />
+          <button class="boton-ojo" type="button" [attr.aria-label]="verClave() ? 'Ocultar contraseña' : 'Mostrar contraseña'" (click)="verClave.set(!verClave())">
+            <span class="material-symbols-rounded">{{ verClave() ? 'visibility_off' : 'visibility' }}</span>
+          </button>
+        </div>
+        <span class="ayuda">Mínimo 8 caracteres.</span>
+      </div>
+
+      <div class="campo">
+        <span class="etiqueta">Cuentas de demostración</span>
+        <app-role-selector [seleccionado]="rolDemo()" (elegir)="elegirDemo($event)" />
+      </div>
+
+      <div class="opciones">
+        <label class="recordar">
+          <input type="checkbox" name="recordar" [(ngModel)]="recordar" />
+          Recordarme
+        </label>
+        <button class="olvido" type="button" (click)="ayudaClave.set(!ayudaClave())">¿Olvidaste tu contraseña?</button>
+      </div>
+
+      @if (ayudaClave()) {
+        <p class="nota">
+          <span class="material-symbols-rounded">support_agent</span>
+          Pídele a un administrador que te asigne una contraseña nueva desde el módulo Usuarios.
+        </p>
+      }
+
+      @if (error()) {
+        <p class="error-campo">
+          <span class="material-symbols-rounded">error</span>
+          {{ error() }}
+        </p>
+      }
+
+      <button class="boton boton-primario boton-bloque ingresar" type="submit" [disabled]="enviando()">
+        {{ enviando() ? 'Verificando...' : 'Ingresar al panel' }}
+        <span class="material-symbols-rounded">{{ enviando() ? 'hourglass_top' : 'arrow_forward' }}</span>
+      </button>
+      @if (enviando()) {
+        <span class="ayuda centrada">La primera vez la API en Render puede tardar hasta un minuto en despertar.</span>
+      }
+    </form>
+
+    <p class="nota">
+      <span class="material-symbols-rounded">info</span>
+      No hay registro: las cuentas del equipo las crea un administrador de InWork.
+    </p>
+  </section>
+</div>

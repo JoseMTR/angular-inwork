@@ -1,0 +1,65 @@
+<div class="pagina">
+  <app-page-header titulo="Auditoría" grupo="Sistema" descripcion="Quién hizo qué y cuándo dentro de la plataforma.">
+    <button class="boton boton-claro" type="button" (click)="exportar()" [disabled]="cargando()">
+      <span class="material-symbols-rounded">download</span>
+      Exportar
+    </button>
+  </app-page-header>
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Cargando eventos" /></div>
+  } @else {
+    <div class="rejilla c-3">
+      @for (dato of resumen(); track dato.titulo) {
+        <app-stat-card [dato]="dato" />
+      }
+    </div>
+
+    <app-tarjeta titulo="Eventos" [subtitulo]="d().eventos.length + ' registrados. Haz clic en uno para ver el detalle.'">
+      <app-tabla-datos
+        [datos]="d().eventos"
+        [columnas]="columnas"
+        [alSeleccionar]="elegir"
+        [seleccionado]="seleccionado()"
+        clave="id_auditoria"
+        [orden]="[[0, 'desc']]"
+      />
+    </app-tarjeta>
+
+    @if (seleccionado(); as sel) {
+      <app-tarjeta [titulo]="registro(sel)" [subtitulo]="f.textoEstado(sel.accion) + ' en la tabla ' + sel.tabla">
+        <app-status-pill acciones [estado]="sel.accion" />
+        <div class="evento">
+          <div class="celda-persona">
+            <app-avatar [nombre]="nombre(sel.id_usuario)" />
+            <div>
+              <strong>{{ nombre(sel.id_usuario) }}</strong>
+              <small>{{ usuariosPorId().get(sel.id_usuario)?.rol ?? '' }}</small>
+            </div>
+          </div>
+          <dl class="detalle">
+            <div><dt>Fecha</dt><dd>{{ f.fechaHora(sel.created) }}</dd></div>
+            <div><dt>IP</dt><dd>{{ sel.ip ?? 'No registrada' }}</dd></div>
+          </dl>
+          <div>
+            <span class="subtitulo-seccion">Datos anteriores y nuevos</span>
+            @if (cambios().length) {
+              <div class="comparacion">
+                <div class="fila cabecera"><span>Campo</span><span>Antes</span><span>Después</span></div>
+                @for (cambio of cambios(); track cambio.campo) {
+                  <div class="fila" [class.cambiada]="cambio.antes !== cambio.despues">
+                    <code class="codigo">{{ cambio.campo }}</code>
+                    <span class="antes">{{ cambio.antes }}</span>
+                    <span class="despues">{{ cambio.despues }}</span>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="texto-3 texto-chico">La API registró la acción sin guardar los valores anteriores y nuevos de este evento.</p>
+            }
+          </div>
+        </div>
+      </app-tarjeta>
+    }
+  }
+</div>

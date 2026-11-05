@@ -1,0 +1,51 @@
+<div class="pagina">
+  <app-page-header titulo="Categorías y habilidades" grupo="Catálogos" descripcion="Los tipos de trabajo que se pueden publicar y los oficios que registran los trabajadores." />
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Cargando categorías" /></div>
+  } @else {
+    <div class="rejilla c-3">
+      <app-stat-card [dato]="{ titulo: 'Categorías', valor: d().categorias.length, icono: 'category', color: 'naranja', detalle: 'tipos de trabajo' }" />
+      <app-stat-card [dato]="{ titulo: 'Habilidades', valor: d().habilidades.length, icono: 'construction', color: 'verde', detalle: 'oficios registrados' }" />
+      <app-stat-card
+        [dato]="{ titulo: 'Más solicitada', valor: porCategoria()[0]?.etiqueta ?? '—', icono: 'trending_up', color: 'azul', detalle: f.cantidad(porCategoria()[0]?.valor ?? 0, 'trabajo') }"
+      />
+    </div>
+
+    <div class="rejilla c-2">
+      <app-crud-catalogo
+        titulo="Categorías"
+        subtitulo="Se eligen al publicar un trabajo"
+        singular="Categoría"
+        [datos]="d().categorias"
+        [columnas]="columnasCategorias"
+        [campos]="campos"
+        ruta="/categorias/"
+        clave="id_categoria"
+        modulo="categorias"
+        [alCambiar]="cargar"
+      />
+      <app-crud-catalogo
+        titulo="Habilidades"
+        subtitulo="Los oficios que tiene cada trabajador"
+        singular="Habilidad"
+        [datos]="d().habilidades"
+        [columnas]="columnasHabilidades"
+        [campos]="campos"
+        ruta="/habilidades/"
+        clave="id_habilidad"
+        modulo="categorias"
+        [alCambiar]="cargar"
+      />
+    </div>
+
+    <div class="rejilla c-2">
+      <app-tarjeta titulo="Trabajos por categoría" subtitulo="Dónde está la demanda">
+        <app-grafico-barras [barras]="porCategoria()" [horizontal]="true" />
+      </app-tarjeta>
+      <app-tarjeta titulo="Trabajadores por habilidad" subtitulo="Qué oficios ofrece la plataforma">
+        <app-grafico-barras [barras]="porHabilidad()" [horizontal]="true" color="verde" />
+      </app-tarjeta>
+    </div>
+  }
+</div>

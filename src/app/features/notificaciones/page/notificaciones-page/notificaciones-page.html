@@ -1,0 +1,79 @@
+<div class="pagina">
+  <app-page-header titulo="Notificaciones" grupo="Moderación" descripcion="Los avisos que reciben los usuarios en la aplicación.">
+    @if (puedeCrear()) {
+      <button class="boton boton-primario" type="button" (click)="abrirNuevo()">
+        <span class="material-symbols-rounded">send</span>
+        Enviar notificación
+      </button>
+    } @else {
+      <span class="solo-lectura"><span class="material-symbols-rounded">visibility</span>Solo tus notificaciones</span>
+    }
+  </app-page-header>
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Cargando notificaciones" /></div>
+  } @else {
+    <div class="rejilla c-3">
+      @for (dato of resumen(); track dato.titulo) {
+        <app-stat-card [dato]="dato" />
+      }
+    </div>
+
+    <app-tarjeta titulo="Notificaciones" subtitulo="Las más recientes primero">
+      <app-tabla-datos [datos]="d().notificaciones" [columnas]="columnas" [acciones]="acciones()" [orden]="[[5, 'desc']]" vacio="No hay notificaciones" />
+    </app-tarjeta>
+  }
+</div>
+
+<app-modal [(abierto)]="modal" [titulo]="editando() ? 'Editar notificación' : 'Enviar notificación'" ancho="560px">
+  <form id="form-notificacion" class="campos" (ngSubmit)="guardar()">
+    @if (!editando()) {
+      <div class="campo">
+        <label for="n-destino">Enviar a</label>
+        <select id="n-destino" name="destino" class="entrada" [(ngModel)]="form.destino">
+          @for (destino of destinos; track destino.valor) {
+            <option [value]="destino.valor">{{ destino.texto }}</option>
+          }
+        </select>
+      </div>
+    }
+    @if (form.destino === 'uno') {
+      <div class="campo">
+        <label for="n-usuario">Persona</label>
+        <select id="n-usuario" name="id_usuario" class="entrada" [(ngModel)]="form.id_usuario">
+          @for (persona of personas(); track persona.id_usuario) {
+            <option [ngValue]="persona.id_usuario">{{ f.nombreCompleto(persona) }} ({{ persona.rol }})</option>
+          }
+        </select>
+      </div>
+    }
+    <div class="campo">
+      <label for="n-tipo">Tipo</label>
+      <select id="n-tipo" name="tipo" class="entrada" [(ngModel)]="form.tipo">
+        @for (tipo of tipos; track tipo.valor) {
+          <option [value]="tipo.valor">{{ tipo.texto }}</option>
+        }
+      </select>
+    </div>
+    <div class="campo">
+      <label for="n-titulo">Título</label>
+      <input id="n-titulo" name="titulo" class="entrada" [(ngModel)]="form.titulo" placeholder="Ej: Actualizamos los términos de uso" />
+    </div>
+    <div class="campo">
+      <label for="n-contenido">Mensaje</label>
+      <textarea id="n-contenido" name="contenido" class="entrada" [(ngModel)]="form.contenido" placeholder="Lo que verá la persona en la app"></textarea>
+    </div>
+    @if (errorForm()) {
+      <p class="error-campo"><span class="material-symbols-rounded">error</span>{{ errorForm() }}</p>
+    }
+  </form>
+  <ng-container ngProjectAs="[pie]">
+    <button class="boton boton-claro" type="button" (click)="modal.set(false)">Cancelar</button>
+    <button class="boton boton-primario" type="submit" form="form-notificacion" [disabled]="guardando()">
+      <span class="material-symbols-rounded">send</span>
+      {{ guardando() ? 'Enviando...' : editando() ? 'Guardar' : 'Enviar' }}
+    </button>
+  </ng-container>
+</app-modal>
+
+<app-confirmar [(abierto)]="confirmar" titulo="Eliminar notificación" [texto]="textoConfirmar()" textoBoton="Eliminar" [alConfirmar]="eliminar" />

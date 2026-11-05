@@ -1,0 +1,27 @@
+@if (barras().length === 0) {
+  <p class="sin-datos">Todavía no hay datos para este gráfico.</p>
+} @else if (horizontal()) {
+  <ul [class]="'filas barras-' + color()">
+    @for (barra of barras(); track $index) {
+      <li>
+        <span class="etiqueta-fila" [title]="barra.etiqueta">{{ barra.etiqueta }}</span>
+        <span class="pista-fila">
+          <span class="relleno" [style.width.%]="porcentaje(barra)"></span>
+        </span>
+        <strong class="valor-fila">{{ formato()(barra.valor) }}</strong>
+      </li>
+    }
+  </ul>
+} @else {
+  <div [class]="'barras barras-' + color()" [style.height.px]="alto()">
+    @for (barra of barras(); track $index) {
+      <div class="columna">
+        <span class="valor">{{ formato()(barra.valor) }}</span>
+        <div class="pista">
+          <div class="relleno" [style.height.%]="porcentaje(barra)"></div>
+        </div>
+        <span class="etiqueta" [title]="barra.etiqueta">{{ barra.etiqueta }}</span>
+      </div>
+    }
+  </div>
+}

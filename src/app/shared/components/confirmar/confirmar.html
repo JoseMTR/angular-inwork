@@ -1,0 +1,10 @@
+<app-modal [(abierto)]="abierto" [titulo]="titulo()" ancho="460px">
+  <p class="texto-2">{{ texto() }}</p>
+  <ng-container ngProjectAs="[pie]">
+    <button class="boton boton-claro" type="button" (click)="abierto.set(false)">Cancelar</button>
+    <button [class]="'boton ' + (peligro() ? 'boton-peligro' : 'boton-primario')" type="button" [disabled]="trabajando()" (click)="confirmar()">
+      {{ trabajando() ? 'Procesando...' : textoBoton() }}
+    </button>
+  </ng-container>
+</app-modal>
+

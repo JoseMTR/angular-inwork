@@ -1,0 +1,52 @@
+<app-tarjeta [titulo]="titulo()" [subtitulo]="subtitulo()">
+  <ng-container ngProjectAs="[acciones]">
+    @if (sesion.permiso(modulo(), 'crear')) {
+      <button class="boton boton-primario boton-pequeno" type="button" (click)="abrirNuevo()">
+        <span class="material-symbols-rounded">add</span>
+        Nuevo
+      </button>
+    } @else {
+      <span class="solo-lectura"><span class="material-symbols-rounded">visibility</span>Solo lectura</span>
+    }
+  </ng-container>
+  <app-tabla-datos [datos]="datos()" [columnas]="columnas()" [acciones]="accionesTabla()" [porPagina]="8" />
+</app-tarjeta>
+
+<app-modal [(abierto)]="abierto" [titulo]="tituloModal()" ancho="480px">
+  <form [id]="idForm" class="campos" (ngSubmit)="guardar()">
+    @for (campo of campos(); track campo.nombre) {
+      <div class="campo">
+        <label [for]="idForm + '-' + campo.nombre">{{ campo.etiqueta }}</label>
+        @if (campo.tipo === 'select') {
+          <select [id]="idForm + '-' + campo.nombre" class="entrada" [name]="campo.nombre" [(ngModel)]="form[campo.nombre]">
+            @for (opcion of campo.opciones ?? []; track opcion.valor) {
+              <option [ngValue]="opcion.valor">{{ opcion.texto }}</option>
+            }
+          </select>
+        } @else if (campo.tipo === 'textarea') {
+          <textarea [id]="idForm + '-' + campo.nombre" class="entrada" [name]="campo.nombre" [(ngModel)]="form[campo.nombre]" [placeholder]="campo.ayuda ?? ''"></textarea>
+        } @else {
+          <input [id]="idForm + '-' + campo.nombre" class="entrada" [name]="campo.nombre" [(ngModel)]="form[campo.nombre]" [placeholder]="campo.ayuda ?? ''" />
+        }
+      </div>
+    }
+    @if (error()) {
+      <p class="error-campo"><span class="material-symbols-rounded">error</span>{{ error() }}</p>
+    }
+  </form>
+  <ng-container ngProjectAs="[pie]">
+    <button class="boton boton-claro" type="button" (click)="abierto.set(false)">Cancelar</button>
+    <button class="boton boton-primario" type="submit" [attr.form]="idForm" [disabled]="guardando()">
+      <span class="material-symbols-rounded">save</span>
+      {{ guardando() ? 'Guardando...' : 'Guardar' }}
+    </button>
+  </ng-container>
+</app-modal>
+
+<app-confirmar
+  [(abierto)]="confirmar"
+  [titulo]="'Desactivar ' + singular().toLowerCase()"
+  [texto]="textoConfirmar()"
+  textoBoton="Desactivar"
+  [alConfirmar]="eliminar"
+/>

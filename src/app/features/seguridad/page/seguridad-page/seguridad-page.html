@@ -1,0 +1,61 @@
+<div class="pagina">
+  <app-page-header titulo="Seguridad" grupo="Sistema" descripcion="Códigos de un solo uso para verificar correos y recuperar contraseñas.">
+    @if (sesion.permiso('seguridad', 'crear')) {
+      <button class="boton boton-primario" type="button" (click)="abrirNuevo()">
+        <span class="material-symbols-rounded">key</span>
+        Generar código
+      </button>
+    }
+  </app-page-header>
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Cargando códigos" /></div>
+  } @else {
+    <div class="rejilla c-3">
+      @for (dato of resumen(); track dato.titulo) {
+        <app-stat-card [dato]="dato" />
+      }
+    </div>
+
+    <app-tarjeta titulo="Códigos de seguridad" subtitulo="Por seguridad el valor del código nunca se muestra en el panel">
+      <app-tabla-datos [datos]="d().tokens" [columnas]="columnas" [acciones]="acciones()" [orden]="[[4, 'desc']]" vacio="No hay códigos registrados" />
+    </app-tarjeta>
+  }
+</div>
+
+<app-modal [(abierto)]="modal" titulo="Generar código" subtitulo="Se crea un código aleatorio de un solo uso" ancho="480px">
+  <form id="form-token" class="campos" (ngSubmit)="guardar()">
+    <div class="campo">
+      <label for="t-usuario">Usuario</label>
+      <select id="t-usuario" name="id_usuario" class="entrada" [(ngModel)]="form.id_usuario">
+        @for (usuario of d().usuarios; track usuario.id_usuario) {
+          <option [ngValue]="usuario.id_usuario">{{ f.nombreCompleto(usuario) }}</option>
+        }
+      </select>
+    </div>
+    <div class="campo">
+      <label for="t-tipo">Para qué sirve</label>
+      <select id="t-tipo" name="tipo" class="entrada" [(ngModel)]="form.tipo">
+        <option value="recuperar_password">Recuperar contraseña</option>
+        <option value="verificacion_correo">Verificar correo</option>
+      </select>
+    </div>
+    <div class="campo">
+      <label for="t-horas">Vence en</label>
+      <select id="t-horas" name="horas" class="entrada" [(ngModel)]="form.horas">
+        <option [ngValue]="1">1 hora</option>
+        <option [ngValue]="24">24 horas</option>
+        <option [ngValue]="72">3 días</option>
+      </select>
+    </div>
+    @if (errorForm()) {
+      <p class="error-campo"><span class="material-symbols-rounded">error</span>{{ errorForm() }}</p>
+    }
+  </form>
+  <ng-container ngProjectAs="[pie]">
+    <button class="boton boton-claro" type="button" (click)="modal.set(false)">Cancelar</button>
+    <button class="boton boton-primario" type="submit" form="form-token" [disabled]="guardando()">{{ guardando() ? 'Generando...' : 'Generar' }}</button>
+  </ng-container>
+</app-modal>
+
+<app-confirmar [(abierto)]="confirmar" titulo="Revocar código" [texto]="textoConfirmar()" textoBoton="Revocar" [alConfirmar]="revocar" />

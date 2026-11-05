@@ -1,0 +1,140 @@
+<div class="pagina">
+  <app-page-header titulo="Trabajos" grupo="Marketplace" descripcion="Todo lo que los empleadores publican para que otras personas lo hagan.">
+    <button class="boton boton-claro" type="button" (click)="exportar()" [disabled]="cargando()">
+      <span class="material-symbols-rounded">download</span>
+      Exportar
+    </button>
+  </app-page-header>
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Cargando trabajos" /></div>
+  } @else {
+    <div class="rejilla c-4">
+      @for (dato of resumen(); track dato.titulo) {
+        <app-stat-card [dato]="dato" />
+      }
+    </div>
+
+    <app-tarjeta titulo="Trabajos publicados" [subtitulo]="d().trabajos.length + ' en total. Haz clic en uno para ver su detalle y ubicarlo en el mapa.'">
+      <app-tabla-datos
+        [datos]="d().trabajos"
+        [columnas]="columnas"
+        [acciones]="acciones()"
+        [alSeleccionar]="elegir"
+        [seleccionado]="seleccionado()"
+        clave="id_trabajo"
+        [orden]="[[4, 'desc']]"
+      />
+    </app-tarjeta>
+
+    @if (seleccionado(); as sel) {
+      <app-tarjeta titulo="Detalle del trabajo" [subtitulo]="'Publicado el ' + f.fecha(sel.created)">
+        <div class="detalle-trabajo">
+          <div class="cabecera-detalle">
+            <h3>{{ sel.titulo }}</h3>
+            <app-status-pill [estado]="sel.estado_trabajo" />
+          </div>
+          <p class="texto-2">{{ sel.descripcion }}</p>
+
+          <dl class="detalle">
+            <div><dt>Cliente</dt><dd>{{ nombre(sel.id_cliente) }}</dd></div>
+            <div><dt>Presupuesto</dt><dd>{{ f.moneda(sel.presupuesto) }}</dd></div>
+            <div><dt>Fecha</dt><dd>{{ f.fecha(sel.fecha_trabajo) }}</dd></div>
+            <div><dt>Horario</dt><dd>{{ f.hora(sel.hora_inicio) }} a {{ f.hora(sel.hora_fin) }}</dd></div>
+            <div class="ancho-total"><dt>Dirección</dt><dd>{{ sel.direccion ?? 'Sin dirección' }}, {{ ciudad(sel.id_ciudad) }}</dd></div>
+          </dl>
+
+          <div>
+            <span class="subtitulo-seccion">Habilidades requeridas</span>
+            @if (habilidades().length) {
+              <div class="fila-chips">
+                @for (habilidad of habilidades(); track $index) {
+                  <span class="chip">{{ habilidad }}</span>
+                }
+              </div>
+            } @else {
+              <p class="texto-3 texto-chico">No pidió habilidades específicas.</p>
+            }
+          </div>
+
+          @if (sesion.permiso('adjuntos')) {
+            <div>
+              <span class="subtitulo-seccion">Fotos adjuntas</span>
+              @if (fotosSel().length) {
+                <div class="fotos">
+                  @for (foto of fotosSel(); track foto.id_adjunto) {
+                    <a class="imagen-falsa" [href]="foto.url" target="_blank" rel="noopener noreferrer" title="Abrir archivo">
+                      <span class="material-symbols-rounded">image</span>
+                    </a>
+                  }
+                </div>
+              } @else {
+                <p class="texto-3 texto-chico">Sin fotos adjuntas.</p>
+              }
+            </div>
+          }
+
+          <div>
+            <span class="subtitulo-seccion">Ofertas recibidas</span>
+            @if (ofertasSel().length) {
+              <ul class="lista">
+                @for (oferta of ofertasSel(); track oferta.id_oferta) {
+                  <li>
+                    <div class="celda-persona">
+                      <app-avatar [nombre]="nombre(oferta.id_trabajador)" tamano="chico" />
+                      <div>
+                        <strong>{{ nombre(oferta.id_trabajador) }}</strong>
+                        <small>{{ f.moneda(oferta.valor_oferta) }}</small>
+                      </div>
+                    </div>
+                    <app-status-pill [estado]="oferta.estado_oferta" />
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="texto-3 texto-chico">Todavía no tiene ofertas.</p>
+            }
+          </div>
+
+          <div class="acciones">
+            @if (sesion.permiso('ofertas')) {
+              <button class="boton boton-claro boton-pequeno" type="button" (click)="irA('ofertas', '/ofertas')">
+                <span class="material-symbols-rounded">local_offer</span>
+                Ver ofertas
+              </button>
+            }
+            @if (sesion.permiso('contrataciones') && (sel.estado_trabajo === 'asignado' || sel.estado_trabajo === 'finalizado')) {
+              <button class="boton boton-suave boton-pequeno" type="button" (click)="irA('contrataciones', '/contrataciones')">
+                <span class="material-symbols-rounded">handshake</span>
+                Ver contratación
+              </button>
+            }
+          </div>
+        </div>
+      </app-tarjeta>
+    }
+
+    <div class="rejilla c-lateral">
+      <section class="mapa vidrio">
+        <app-mapa-trabajos [trabajos]="d().trabajos" [seleccionado]="seleccionado()" [alSeleccionar]="elegir" [nombreCategoria]="categoria" />
+      </section>
+
+      <app-tarjeta titulo="Trabajos por ciudad" subtitulo="Publicados y asignados">
+        <ul class="lista">
+          @for (fila of porCiudad(); track fila.etiqueta) {
+            <li>
+              <span class="ciudad">
+                <span class="material-symbols-rounded">location_city</span>
+                {{ fila.etiqueta }}
+              </span>
+              <strong class="numero">{{ fila.valor }}</strong>
+            </li>
+          }
+        </ul>
+        <p class="nota-mapa">El mapa usa la latitud y longitud que el empleador guardó al publicar cada trabajo.</p>
+      </app-tarjeta>
+    </div>
+  }
+</div>
+
+<app-confirmar [(abierto)]="confirmar" titulo="Desactivar trabajo" [texto]="textoConfirmar()" textoBoton="Desactivar" [alConfirmar]="eliminar" />

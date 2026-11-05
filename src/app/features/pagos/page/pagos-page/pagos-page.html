@@ -1,0 +1,100 @@
+<div class="pagina">
+  <app-page-header titulo="Pagos y custodias" grupo="Finanzas" descripcion="El dinero que entra a la custodia de InWork, lo que se le paga a cada trabajador y las comisiones.">
+    <span class="chip origen">
+      <span class="material-symbols-rounded">cloud_sync</span>
+      Datos de la API de pagos
+    </span>
+    <button class="boton boton-claro" type="button" (click)="exportar()" [disabled]="cargando()">
+      <span class="material-symbols-rounded">download</span>
+      Exportar
+    </button>
+  </app-page-header>
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Consultando la API de pagos" /></div>
+  } @else if (error()) {
+    <div class="vidrio">
+      <app-empty-state icono="cloud_off" titulo="No se pudo conectar con la API de pagos" [texto]="error()">
+        <button class="boton boton-primario" type="button" (click)="cargar()">Reintentar</button>
+      </app-empty-state>
+    </div>
+  } @else {
+    <div class="rejilla c-4">
+      @for (dato of resumen(); track dato.titulo) {
+        <app-stat-card [dato]="dato" />
+      }
+    </div>
+
+    <div class="rejilla c-ancha">
+      <app-tarjeta titulo="Dinero por tipo de movimiento" subtitulo="En miles de pesos">
+        <app-grafico-barras [barras]="porTipo()" color="morado" [alto]="300" [formato]="formatoMiles" />
+      </app-tarjeta>
+      <app-tarjeta titulo="Métodos de pago" [subtitulo]="depositos() + ' depósitos de clientes'">
+        <app-grafico-dona [segmentos]="metodos()" [textoCentral]="'con ' + (metodos()[0]?.nombre ?? '—')" />
+      </app-tarjeta>
+    </div>
+
+    <app-tarjeta titulo="Custodias" subtitulo="Una por contratación. Haz clic en una para ver solo sus movimientos.">
+      @if (!puedeResolver()) {
+        <span acciones class="solo-lectura"><span class="material-symbols-rounded">visibility</span>Solo lectura</span>
+      }
+      <app-tabla-datos
+        [datos]="d().custodias"
+        [columnas]="columnasCustodias"
+        [acciones]="accionesCustodias()"
+        [alSeleccionar]="elegir"
+        [seleccionado]="seleccionada()"
+        clave="id_custodia"
+      />
+    </app-tarjeta>
+
+    <app-tarjeta
+      titulo="Movimientos"
+      [subtitulo]="seleccionada() ? 'Solo de ' + trabajo(seleccionada().id_contratacion) : 'Cada depósito pasa por la custodia antes de llegar al trabajador'"
+    >
+      @if (seleccionada()) {
+        <button acciones class="boton boton-claro boton-pequeno" type="button" (click)="seleccionada.set(null)">
+          <span class="material-symbols-rounded">filter_alt_off</span>
+          Ver todos
+        </button>
+      }
+      <app-tabla-datos [datos]="movimientos()" [columnas]="columnasPagos" [orden]="[[5, 'desc']]" />
+    </app-tarjeta>
+  }
+</div>
+
+<app-modal [(abierto)]="modal" titulo="Resolver disputa" [subtitulo]="objetivo() ? trabajo(objetivo().id_contratacion) : ''" ancho="520px">
+  @if (objetivo(); as o) {
+    <dl class="detalle">
+      <div><dt>Cliente</dt><dd>{{ persona(o.correo_cliente) }}</dd></div>
+      <div><dt>Trabajador</dt><dd>{{ o.nombre_trabajador }}</dd></div>
+      <div><dt>Monto en custodia</dt><dd>{{ f.moneda(o.monto) }}</dd></div>
+      <div><dt>Estado</dt><dd><app-status-pill [estado]="o.estado_custodia" /></dd></div>
+      <div class="ancho-total"><dt>Motivo de la disputa</dt><dd>{{ o.motivo_disputa ?? 'Sin motivo registrado' }}</dd></div>
+    </dl>
+    <div class="opciones">
+      <label class="opcion" [class.elegida]="decision() === 'liberar'">
+        <input type="radio" name="decision" value="liberar" [checked]="decision() === 'liberar'" (change)="decision.set('liberar')" />
+        <span class="material-symbols-rounded">payments</span>
+        <strong>Pagar al trabajador</strong>
+        <small>Se le transfiere el dinero menos la comisión de InWork</small>
+      </label>
+      <label class="opcion" [class.elegida]="decision() === 'reembolsar'">
+        <input type="radio" name="decision" value="reembolsar" [checked]="decision() === 'reembolsar'" (change)="decision.set('reembolsar')" />
+        <span class="material-symbols-rounded">undo</span>
+        <strong>Devolver al cliente</strong>
+        <small>Se le reembolsa el monto completo</small>
+      </label>
+    </div>
+  }
+  @if (errorForm()) {
+    <p class="error-campo"><span class="material-symbols-rounded">error</span>{{ errorForm() }}</p>
+  }
+  <ng-container ngProjectAs="[pie]">
+    <button class="boton boton-claro" type="button" (click)="modal.set(false)">Cancelar</button>
+    <button class="boton boton-primario" type="button" [disabled]="guardando()" (click)="resolver()">
+      <span class="material-symbols-rounded">gavel</span>
+      {{ guardando() ? 'Resolviendo...' : 'Confirmar decisión' }}
+    </button>
+  </ng-container>
+</app-modal>

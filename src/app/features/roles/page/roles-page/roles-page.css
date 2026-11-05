@@ -1,0 +1,97 @@
+.roles {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+.rol {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  text-align: left;
+  cursor: pointer;
+}
+.rol:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.rol.elegido {
+  border-color: rgba(242, 84, 27, 0.45);
+  box-shadow: var(--sombra), 0 0 0 3px var(--naranja-suave);
+}
+.rol.nuevo {
+  border-style: dashed;
+}
+.rol-icono {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  color: var(--texto-2);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--linea);
+  flex-shrink: 0;
+}
+.rol.elegido .rol-icono {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--naranja-2), var(--naranja));
+}
+.rol-texto {
+  flex: 1;
+  min-width: 0;
+}
+.rol-texto strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+}
+.rol-texto small {
+  display: block;
+  font-size: 12px;
+  color: var(--texto-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.usuarios {
+  font-size: 12px;
+  color: var(--texto-3);
+  text-align: right;
+}
+.usuarios strong {
+  display: block;
+  font-size: 20px;
+  color: var(--texto);
+}
+
+.item-menu {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+.item-menu .material-symbols-rounded {
+  font-size: 18px;
+  color: var(--verde);
+}
+.lista small {
+  font-size: 12px;
+  color: var(--texto-3);
+}
+.acceso-lectura .item-menu .material-symbols-rounded {
+  color: var(--azul);
+}
+.acceso-parcial .item-menu .material-symbols-rounded {
+  color: var(--ambar);
+}
+.acceso-ninguno {
+  opacity: 0.5;
+}
+.acceso-ninguno .item-menu .material-symbols-rounded {
+  color: var(--texto-3);
+}
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}

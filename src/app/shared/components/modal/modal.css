@@ -1,0 +1,41 @@
+.caja {
+  width: 100%;
+  margin: auto;
+  padding: 22px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.92);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+h2 {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+p {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--texto-3);
+}
+.cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pie {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pie:empty {
+  display: none;
+}

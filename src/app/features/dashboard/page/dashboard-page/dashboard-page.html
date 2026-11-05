@@ -1,0 +1,100 @@
+<div class="pagina">
+  <app-page-header titulo="Inicio" grupo="General" [descripcion]="'Hola, ' + (sesion.sesion()?.nombre ?? '') + '. Así va InWork hoy según la base de datos.'">
+    <button class="boton boton-claro" type="button" (click)="exportar()" [disabled]="cargando()">
+      <span class="material-symbols-rounded">download</span>
+      Exportar
+    </button>
+    @if (sesion.permiso('informes')) {
+      <a class="boton boton-suave" routerLink="/informes">
+        <span class="material-symbols-rounded">auto_awesome</span>
+        Explicar con IA
+      </a>
+    }
+  </app-page-header>
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Cargando el resumen de la plataforma" /></div>
+  } @else {
+    <div class="rejilla c-5">
+      @for (metrica of metricas(); track metrica.titulo) {
+        <app-stat-card [dato]="metrica" />
+      }
+    </div>
+
+    @if (sesion.permiso('trabajos')) {
+      <div class="rejilla c-ancha">
+        <app-tarjeta titulo="Evolución" [subtitulo]="serie() + ' por semana (últimas 10 semanas con movimiento)'">
+          <div acciones class="segmentado">
+            @for (opcion of series; track opcion) {
+              <button type="button" class="segmento" [class.activo]="opcion === serie()" (click)="serie.set(opcion)">{{ opcion }}</button>
+            }
+          </div>
+          <app-grafico-area [valores]="evolucion().valores" [etiquetas]="evolucion().etiquetas" />
+        </app-tarjeta>
+
+        <app-tarjeta titulo="Trabajos por estado" [subtitulo]="d().trabajos.length + ' trabajos en total'">
+          <app-grafico-dona [segmentos]="trabajosPorEstado()" textoCentral="publicados" />
+        </app-tarjeta>
+      </div>
+    }
+
+    <div class="rejilla c-3">
+      <app-tarjeta titulo="Categorías más solicitadas" subtitulo="Trabajos publicados por categoría">
+        <app-grafico-barras [barras]="categorias()" [horizontal]="true" />
+      </app-tarjeta>
+
+      <app-tarjeta titulo="Mejores trabajadores" subtitulo="Top 5 por calificación">
+        @if (mejores().length === 0) {
+          <p class="texto-3">Aún no hay trabajadores con calificaciones.</p>
+        } @else {
+          <ul class="lista">
+            @for (trabajador of mejores(); track $index) {
+              <li>
+                <div class="celda-persona">
+                  <span class="puesto">{{ $index + 1 }}</span>
+                  <app-avatar [nombre]="trabajador.nombre" tamano="chico" />
+                  <div>
+                    <strong>{{ trabajador.nombre }}</strong>
+                    <small>{{ trabajador.oficio }}, {{ trabajador.trabajos }} trabajos</small>
+                  </div>
+                </div>
+                <span class="nota-estrella">
+                  <span class="material-symbols-rounded">star</span>
+                  {{ trabajador.calificacion }}
+                </span>
+              </li>
+            }
+          </ul>
+        }
+      </app-tarjeta>
+
+      <app-tarjeta titulo="Alertas" subtitulo="Lo que necesita atención hoy">
+        @if (alertas().length === 0) {
+          <app-empty-state icono="task_alt" titulo="Todo en orden" texto="No hay pendientes para tu rol en este momento." />
+        } @else {
+          <div class="alertas">
+            @for (alerta of alertas(); track alerta.titulo) {
+              <a [class]="'alerta alerta-' + alerta.tono" [routerLink]="alerta.ruta">
+                <span class="alerta-icono">
+                  <span class="material-symbols-rounded">{{ alerta.icono }}</span>
+                </span>
+                <span class="alerta-texto">
+                  <strong>{{ alerta.titulo }}</strong>
+                  <small>{{ alerta.detalle }}</small>
+                </span>
+                <span class="material-symbols-rounded flecha">chevron_right</span>
+              </a>
+            }
+          </div>
+        }
+      </app-tarjeta>
+    </div>
+
+    <app-tarjeta titulo="Actividad reciente" subtitulo="Últimos movimientos de trabajos, ofertas, contrataciones y reportes">
+      @if (sesion.permiso('auditoria')) {
+        <a acciones class="boton boton-claro boton-pequeno" routerLink="/auditoria">Ver auditoría</a>
+      }
+      <app-tabla-datos [datos]="actividad()" [columnas]="columnasActividad" [orden]="[[4, 'desc']]" vacio="Todavía no hay actividad" />
+    </app-tarjeta>
+  }
+</div>

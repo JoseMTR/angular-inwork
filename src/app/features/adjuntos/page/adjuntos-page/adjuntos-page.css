@@ -1,0 +1,8 @@
+.campos {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.campos .rejilla {
+  gap: 14px;
+}

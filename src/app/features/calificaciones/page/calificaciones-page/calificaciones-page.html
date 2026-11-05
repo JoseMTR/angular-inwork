@@ -1,0 +1,52 @@
+<div class="pagina">
+  <app-page-header titulo="Calificaciones" grupo="Personas" descripcion="Lo que opinan clientes y trabajadores entre sí después de cada trabajo.">
+    @if (!sesion.permiso('calificaciones', 'eliminar')) {
+      <span class="solo-lectura"><span class="material-symbols-rounded">visibility</span>Solo lectura</span>
+    }
+  </app-page-header>
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Cargando reseñas" /></div>
+  } @else {
+    <div class="rejilla c-3">
+      @for (dato of resumen(); track dato.titulo) {
+        <app-stat-card [dato]="dato" />
+      }
+    </div>
+
+    <div class="rejilla c-ancha">
+      <app-tarjeta titulo="Reseñas" subtitulo="Las más recientes primero">
+        <app-tabla-datos [datos]="d().calificaciones" [columnas]="columnas" [acciones]="acciones()" [orden]="[[4, 'desc']]" />
+      </app-tarjeta>
+
+      <div class="lateral">
+        <app-tarjeta titulo="Distribución por estrellas" [subtitulo]="d().calificaciones.length + ' reseñas'">
+          <app-grafico-barras [barras]="distribucion()" [horizontal]="true" color="ambar" />
+        </app-tarjeta>
+
+        <app-tarjeta titulo="Usuarios a vigilar" subtitulo="Peor promedio entre quienes tienen reseñas">
+          @if (vigilados().length === 0) {
+            <p class="texto-3">Nadie tiene reseñas todavía.</p>
+          } @else {
+            <ul class="lista">
+              @for (usuario of vigilados(); track $index) {
+                <li>
+                  <div class="celda-persona">
+                    <app-avatar [nombre]="usuario.nombre" tamano="chico" />
+                    <div>
+                      <strong>{{ usuario.nombre }}</strong>
+                      <small>{{ f.cantidad(usuario.resenas, 'reseña') }}, {{ f.cantidad(usuario.reportes, 'reporte') }}</small>
+                    </div>
+                  </div>
+                  <span class="promedio" [class.bajo]="usuario.bajo">{{ usuario.promedio }}</span>
+                </li>
+              }
+            </ul>
+          }
+        </app-tarjeta>
+      </div>
+    </div>
+  }
+</div>
+
+<app-confirmar [(abierto)]="confirmar" titulo="Eliminar reseña" [texto]="textoConfirmar()" textoBoton="Eliminar" [alConfirmar]="eliminar" />

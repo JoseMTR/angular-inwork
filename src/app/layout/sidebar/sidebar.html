@@ -1,0 +1,46 @@
+<aside class="lateral vidrio lateral-panel" [class.abierto]="abierto()">
+  <a class="marca" routerLink="/inicio" (click)="abierto.set(false)">
+    <span class="logo">
+      <span class="material-symbols-rounded">bolt</span>
+    </span>
+    <span class="marca-texto">
+      <strong>InWork</strong>
+      <small>Panel de administración</small>
+    </span>
+  </a>
+
+  <nav class="menu" aria-label="Menú principal">
+    @for (grupo of grupos(); track grupo.titulo) {
+      <div class="grupo">
+        <span class="grupo-titulo">
+          <i [style.background]="grupo.color"></i>
+          {{ grupo.titulo }}
+        </span>
+        @for (item of grupo.items; track item.ruta) {
+          <a class="enlace" [routerLink]="item.ruta" routerLinkActive="activo" [title]="item.texto" (click)="abierto.set(false)">
+            <span class="material-symbols-rounded">{{ item.icono }}</span>
+            <span class="enlace-texto">{{ item.texto }}</span>
+            @if (insignias()[item.nombre]) {
+              <span class="insignia">{{ insignias()[item.nombre] }}</span>
+            }
+          </a>
+        }
+      </div>
+    }
+  </nav>
+
+  <div class="cuenta">
+    <app-avatar [nombre]="usuario()?.nombre ?? ''" />
+    <div class="cuenta-texto">
+      <strong>{{ usuario()?.nombre }}</strong>
+      <small>{{ usuario()?.rol }}</small>
+    </div>
+    <button class="salir" type="button" aria-label="Cerrar sesión" title="Cerrar sesión" (click)="salir.emit()">
+      <span class="material-symbols-rounded">logout</span>
+    </button>
+  </div>
+</aside>
+
+@if (abierto()) {
+  <button class="velo" type="button" aria-label="Cerrar menú" (click)="abierto.set(false)"></button>
+}

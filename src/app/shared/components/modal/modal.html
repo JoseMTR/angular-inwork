@@ -1,0 +1,23 @@
+@if (abierto()) {
+  <div class="fondo-modal" role="presentation" (click)="clicFondo($event)">
+    <div class="caja vidrio" [style.max-width]="ancho()" role="dialog" aria-modal="true" [attr.aria-label]="titulo()">
+      <header class="cabecera">
+        <div>
+          <h2>{{ titulo() }}</h2>
+          @if (subtitulo()) {
+            <p>{{ subtitulo() }}</p>
+          }
+        </div>
+        <button class="boton boton-claro boton-icono" type="button" aria-label="Cerrar" (click)="cerrar()">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </header>
+      <div class="cuerpo">
+        <ng-content></ng-content>
+      </div>
+      <footer class="pie">
+        <ng-content select="[pie]"></ng-content>
+      </footer>
+    </div>
+  </div>
+}

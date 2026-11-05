@@ -1,0 +1,8 @@
+<div class="cargando" role="status">
+  <span class="rueda" aria-hidden="true"></span>
+  <strong>{{ texto() }}</strong>
+  @if (ayuda()) {
+    <small>Si la API estaba dormida en Render puede tardar hasta un minuto la primera vez.</small>
+  }
+</div>
+

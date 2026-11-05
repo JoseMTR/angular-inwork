@@ -1,0 +1,89 @@
+<div class="pagina">
+  <app-page-header titulo="Roles y permisos" grupo="Sistema" descripcion="Decide qué puede hacer cada rol en cada módulo. El menú de cada persona se arma con esta tabla.">
+    @if (puedeEditar()) {
+      <button class="boton boton-claro" type="button" (click)="elegirRol(rolElegido())" [disabled]="cambios().length === 0">Descartar</button>
+      <button class="boton boton-primario" type="button" (click)="guardar()" [disabled]="cambios().length === 0 || guardando()">
+        <span class="material-symbols-rounded">save</span>
+        {{ textoGuardar() }}
+      </button>
+    }
+  </app-page-header>
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Cargando roles" /></div>
+  } @else {
+    <div class="rejilla roles">
+      @for (rol of d().roles; track rol.id_rol) {
+        <button
+          type="button"
+          class="rol vidrio"
+          [class.elegido]="rol.id_rol === rolElegido()?.id_rol"
+          (click)="elegirRol(rol)"
+          [disabled]="cambios().length > 0 && rol.id_rol !== rolElegido()?.id_rol"
+          [title]="cambios().length > 0 ? 'Guarda o descarta los cambios primero' : ''"
+        >
+          <span class="rol-icono">
+            <span class="material-symbols-rounded">{{ iconosRol[rol.id_rol] ?? 'badge' }}</span>
+          </span>
+          <span class="rol-texto">
+            <strong>{{ rol.nombre }}</strong>
+            <small>{{ rol.descripcion ?? '' }}</small>
+          </span>
+          <span class="usuarios">
+            <strong>{{ usuariosDe(rol) }}</strong>
+            usuarios
+          </span>
+        </button>
+      }
+      @if (sesion.permiso('roles', 'crear')) {
+        <button type="button" class="rol vidrio nuevo" (click)="abrirRol()">
+          <span class="rol-icono"><span class="material-symbols-rounded">add</span></span>
+          <span class="rol-texto"><strong>Nuevo rol</strong><small>Crea un rol y dale permisos</small></span>
+        </button>
+      }
+    </div>
+
+    <div class="rejilla c-lateral">
+      <app-tarjeta
+        [titulo]="'Permisos de ' + (rolElegido()?.nombre ?? '')"
+        [subtitulo]="esAdmin() ? 'El administrador siempre tiene acceso total a todo' : 'Cada interruptor corresponde a una acción sobre el módulo'"
+      >
+        @if (puedeEditar() && rolElegido()) {
+          <button acciones class="boton boton-claro boton-pequeno" type="button" (click)="abrirRol(rolElegido())">
+            <span class="material-symbols-rounded">edit</span>
+            Editar rol
+          </button>
+        }
+        <app-tabla-datos [datos]="filas()" [columnas]="columnas" [alClicElemento]="alternar" [porPagina]="25" />
+      </app-tarjeta>
+
+      <app-tarjeta titulo="Lo que verá este rol" subtitulo="Menú con la configuración actual">
+        <ul class="lista">
+          @for (item of menu(); track $index) {
+            <li [class]="'acceso-' + item.acceso">
+              <span class="item-menu">
+                <span class="material-symbols-rounded">{{ item.acceso === 'ninguno' ? 'visibility_off' : 'visibility' }}</span>
+                {{ item.texto }}
+              </span>
+              <small>{{ textoAcceso[item.acceso] }}</small>
+            </li>
+          }
+        </ul>
+      </app-tarjeta>
+    </div>
+  }
+</div>
+
+<app-modal [(abierto)]="modalRol" [titulo]="editandoRol() ? 'Editar rol' : 'Nuevo rol'" ancho="460px">
+  <form id="form-rol" class="campos" (ngSubmit)="guardarRol()">
+    <div class="campo"><label for="rol-nombre">Nombre</label><input id="rol-nombre" name="nombre" class="entrada" [(ngModel)]="formRol.nombre" placeholder="Ej: Soporte" /></div>
+    <div class="campo"><label for="rol-desc">Descripción</label><textarea id="rol-desc" name="descripcion" class="entrada" [(ngModel)]="formRol.descripcion"></textarea></div>
+    @if (errorRol()) {
+      <p class="error-campo"><span class="material-symbols-rounded">error</span>{{ errorRol() }}</p>
+    }
+  </form>
+  <ng-container ngProjectAs="[pie]">
+    <button class="boton boton-claro" type="button" (click)="modalRol.set(false)">Cancelar</button>
+    <button class="boton boton-primario" type="submit" form="form-rol">Guardar</button>
+  </ng-container>
+</app-modal>

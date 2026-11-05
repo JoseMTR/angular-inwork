@@ -1,0 +1,48 @@
+<header class="superior vidrio">
+  <button class="boton boton-claro boton-icono hamburguesa" type="button" aria-label="Abrir menú" (click)="abrirMenu.emit()">
+    <span class="material-symbols-rounded">menu</span>
+  </button>
+
+  <form class="buscar" (ngSubmit)="enviar()" role="search">
+    <span class="material-symbols-rounded">search</span>
+    <input
+      type="search"
+      name="busqueda"
+      placeholder="Ir a un módulo: usuarios, pagos, reportes..."
+      [ngModel]="busqueda()"
+      (ngModelChange)="busqueda.set($event)"
+      (focus)="enfocado.set(true)"
+      (blur)="salirDelBuscador()"
+    />
+    <kbd>Enter</kbd>
+    @if (enfocado() && coincidencias().length > 0) {
+      <ul class="sugerencias vidrio">
+        @for (opcion of coincidencias(); track opcion.ruta) {
+          <li>
+            <button type="button" (click)="ir(opcion.ruta)">
+              <span class="material-symbols-rounded">{{ opcion.icono }}</span>
+              {{ opcion.texto }}
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </form>
+
+  <div class="derecha">
+    @if (verNotificaciones()) {
+      <a class="boton boton-claro boton-icono campana" routerLink="/notificaciones" aria-label="Notificaciones" title="Notificaciones">
+        <span class="material-symbols-rounded">notifications</span>
+        @if (noLeidas() > 0) {
+          <span class="punto">{{ noLeidas() > 9 ? '9+' : noLeidas() }}</span>
+        }
+      </a>
+    }
+    @if (verInformes()) {
+      <a class="boton boton-primario" routerLink="/informes">
+        <span class="material-symbols-rounded">auto_awesome</span>
+        <span class="texto-boton">Pedir informe a la IA</span>
+      </a>
+    }
+  </div>
+</header>

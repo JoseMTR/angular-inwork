@@ -1,0 +1,260 @@
+<div class="pagina">
+  <app-page-header titulo="Usuarios" grupo="Personas" descripcion="Todas las personas registradas en InWork. Elige una para ver toda su actividad.">
+    <button class="boton boton-claro" type="button" (click)="exportar()" [disabled]="cargando()">
+      <span class="material-symbols-rounded">download</span>
+      Exportar
+    </button>
+    @if (puedeCrear()) {
+      <button class="boton boton-primario" type="button" (click)="abrirNuevo()">
+        <span class="material-symbols-rounded">person_add</span>
+        Nuevo usuario
+      </button>
+    } @else {
+      <span class="solo-lectura"><span class="material-symbols-rounded">visibility</span>Solo lectura</span>
+    }
+  </app-page-header>
+
+  @if (cargando()) {
+    <div class="vidrio"><app-cargando texto="Cargando usuarios" /></div>
+  } @else if (error()) {
+    <div class="vidrio">
+      <app-empty-state icono="cloud_off" titulo="No se pudieron cargar los usuarios" [texto]="error()">
+        <button class="boton boton-primario" type="button" (click)="cargar()">Reintentar</button>
+      </app-empty-state>
+    </div>
+  } @else {
+    <div class="rejilla c-4">
+      @for (dato of resumen(); track dato.titulo) {
+        <app-stat-card [dato]="dato" />
+      }
+    </div>
+
+    <app-tarjeta titulo="Listado de usuarios" [subtitulo]="d().usuarios.length + ' cuentas activas. Haz clic en una fila para ver el detalle.'">
+      <app-tabla-datos [datos]="d().usuarios" [columnas]="columnas" [acciones]="acciones()" [alSeleccionar]="elegir" [seleccionado]="seleccionado()" clave="id_usuario" />
+    </app-tarjeta>
+
+    @if (seleccionado(); as sel) {
+      <section class="detalle-usuario vidrio">
+        <header class="perfil">
+          <app-avatar [nombre]="f.nombreCompleto(sel)" tamano="grande" />
+          <div class="perfil-texto">
+            <div class="perfil-nombre">
+              <h2>{{ f.nombreCompleto(sel) }}</h2>
+              <app-status-pill [estado]="sel.estado ? 'activo' : 'inactivo'" />
+            </div>
+            <span class="texto-2">{{ sel.correo }}, {{ sel.rol }} desde {{ f.fecha(sel.created) }}</span>
+          </div>
+          <div class="acciones">
+            @if (sesion.permiso('reportes')) {
+              <a class="boton boton-claro" routerLink="/reportes">
+                <span class="material-symbols-rounded">flag</span>
+                Ver reportes
+              </a>
+            }
+            @if (esAdmin()) {
+              <button class="boton boton-claro" type="button" (click)="abrirEditar(sel)">
+                <span class="material-symbols-rounded">edit</span>
+                Editar
+              </button>
+              @if (sel.id_usuario !== sesion.sesion()?.id_usuario) {
+                <button class="boton boton-claro" type="button" (click)="abrirRol(sel)">
+                  <span class="material-symbols-rounded">manage_accounts</span>
+                  Cambiar rol
+                </button>
+                <button class="boton boton-peligro" type="button" (click)="abrirDesactivar(sel)">
+                  <span class="material-symbols-rounded">block</span>
+                  Desactivar
+                </button>
+              }
+            }
+          </div>
+        </header>
+
+        <div class="segmentado pestanas">
+          @for (opcion of pestanas; track opcion) {
+            <button type="button" class="segmento" [class.activo]="opcion === pestana()" (click)="pestana.set(opcion)">{{ opcion }}</button>
+          }
+        </div>
+
+        @if (pestana() === 'Resumen') {
+          <div class="cuerpo">
+            <div class="bloque">
+              <span class="subtitulo-seccion">Datos personales</span>
+              <dl class="detalle">
+                <div><dt>Teléfono</dt><dd>{{ sel.telefono }}</dd></div>
+                <div><dt>Ciudad</dt><dd>{{ sel.ciudad ?? 'Sin ciudad' }}</dd></div>
+                <div><dt>Dirección</dt><dd>{{ sel.direccion || 'Sin dirección' }}</dd></div>
+                <div><dt>Nacimiento</dt><dd>{{ f.fecha(sel.fecha_nacimiento) }}</dd></div>
+                <div><dt>Documento</dt><dd>{{ f.capitalizar(sel.tipo_identificacion) }} {{ sel.numero_identificacion }}</dd></div>
+                <div><dt>Registro</dt><dd>{{ f.fecha(sel.created) }}</dd></div>
+              </dl>
+            </div>
+
+            <div class="bloque">
+              <span class="subtitulo-seccion">Habilidades</span>
+              @if (habilidadesSel().length) {
+                <div class="fila-chips">
+                  @for (habilidad of habilidadesSel(); track $index) {
+                    <span class="chip">{{ habilidad.nombre }} <small>{{ habilidad.anios }} años</small></span>
+                  }
+                </div>
+              } @else {
+                <p class="texto-3 texto-chico">No tiene habilidades registradas.</p>
+              }
+              <div class="totales">
+                <div class="dato-mini"><span>Trabajos</span><strong>{{ trabajosSel().length }}</strong></div>
+                <div class="dato-mini"><span>Contratos</span><strong>{{ contratosSel().length }}</strong></div>
+                <div class="dato-mini"><span>Ofertas</span><strong>{{ ofertasSel().length }}</strong></div>
+              </div>
+            </div>
+
+            <div class="bloque">
+              <span class="subtitulo-seccion">Actividad</span>
+              @if (actividadSel().length) {
+                <ul class="linea-tiempo">
+                  @for (evento of actividadSel(); track $index) {
+                    <li [class]="$index === 0 ? 'actual' : 'hecho'">
+                      <strong>{{ evento.titulo }}</strong>
+                      <small>{{ f.fechaHora(evento.fecha) }}</small>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <p class="texto-3 texto-chico">Sin movimientos todavía.</p>
+              }
+            </div>
+          </div>
+        } @else {
+          @if (listaPestana().length === 0) {
+            <p class="texto-3">No hay {{ pestana().toLowerCase() }} para este usuario.</p>
+          } @else {
+            <ul class="lista">
+              @for (item of listaPestana(); track $index) {
+                <li>
+                  <div>
+                    <strong class="bloque-texto">{{ item.titulo }}</strong>
+                    <small class="texto-3">{{ item.detalle }}</small>
+                  </div>
+                  @if (item.estado) {
+                    <app-status-pill [estado]="item.estado" />
+                  }
+                </li>
+              }
+            </ul>
+          }
+        }
+      </section>
+    }
+
+    <div class="rejilla c-2">
+      <app-tarjeta titulo="Usuarios por rol" subtitulo="Cuántas cuentas hay de cada rol">
+        <app-grafico-barras [barras]="porRol()" color="azul" />
+      </app-tarjeta>
+      <app-tarjeta titulo="Usuarios por ciudad" subtitulo="Las ciudades con más usuarios">
+        <app-grafico-barras [barras]="porCiudad()" [horizontal]="true" color="azul" />
+      </app-tarjeta>
+    </div>
+  }
+</div>
+
+<app-modal
+  [(abierto)]="abiertoModal"
+  [titulo]="titulosModal[modal()] ?? ''"
+  [subtitulo]="objetivo() ? f.nombreCompleto(objetivo()) : 'La persona podrá iniciar sesión con este correo'"
+  [ancho]="modal() === 'nuevo' || modal() === 'editar' ? '720px' : '460px'"
+>
+  <form id="form-usuario" class="formulario" (ngSubmit)="guardar()">
+    @if (modal() === 'nuevo' || modal() === 'editar') {
+      <div class="rejilla c-2">
+        <div class="campo"><label for="u-nombre">Nombre</label><input id="u-nombre" name="nombre" class="entrada" [(ngModel)]="form.nombre" /></div>
+        <div class="campo"><label for="u-apellido">Apellidos</label><input id="u-apellido" name="apellido" class="entrada" [(ngModel)]="form.apellido" /></div>
+        @if (modal() === 'nuevo') {
+          <div class="campo">
+            <label for="u-correo">Correo</label>
+            <input id="u-correo" name="correo" class="entrada" type="email" [(ngModel)]="form.correo" placeholder="nombre@inwork.com.co" />
+          </div>
+          <div class="campo">
+            <label for="u-clave">Contraseña</label>
+            <input id="u-clave" name="password" class="entrada" type="password" [(ngModel)]="form.password" placeholder="Mínimo 8 caracteres" />
+          </div>
+          <div class="campo">
+            <label for="u-tipo">Tipo de documento</label>
+            <select id="u-tipo" name="tipo_identificacion" class="entrada" [(ngModel)]="form.tipo_identificacion">
+              @for (tipo of tiposDocumento; track tipo) {
+                <option [value]="tipo">{{ f.capitalizar(tipo) }}</option>
+              }
+            </select>
+          </div>
+          <div class="campo">
+            <label for="u-doc">Número de documento</label>
+            <input id="u-doc" name="numero_identificacion" class="entrada" [(ngModel)]="form.numero_identificacion" inputmode="numeric" />
+          </div>
+          <div class="campo">
+            <label for="u-nac">Fecha de nacimiento</label>
+            <input id="u-nac" name="fecha_nacimiento" class="entrada" type="date" [(ngModel)]="form.fecha_nacimiento" />
+          </div>
+          <div class="campo">
+            <label for="u-rol">Rol</label>
+            <select id="u-rol" name="id_rol" class="entrada" [(ngModel)]="form.id_rol">
+              @for (rol of roles; track rol.id_rol) {
+                <option [ngValue]="rol.id_rol">{{ rol.nombre }}</option>
+              }
+            </select>
+          </div>
+        }
+        <div class="campo">
+          <label for="u-tel">Teléfono</label>
+          <input id="u-tel" name="telefono" class="entrada" [(ngModel)]="form.telefono" placeholder="3001234567" inputmode="tel" />
+        </div>
+        <div class="campo">
+          <label for="u-ciudad">Ciudad</label>
+          <select id="u-ciudad" name="id_ciudad" class="entrada" [(ngModel)]="form.id_ciudad">
+            <option [ngValue]="null">Sin ciudad</option>
+            @for (ciudad of d().ciudades ?? []; track ciudad.id_ciudad) {
+              <option [ngValue]="ciudad.id_ciudad">{{ ciudad.nombre }}</option>
+            }
+          </select>
+        </div>
+        <div class="campo ancho-total">
+          <label for="u-dir">Dirección</label>
+          <input id="u-dir" name="direccion" class="entrada" [(ngModel)]="form.direccion" placeholder="Calle 72 #45-10, barrio" />
+        </div>
+        <div class="campo ancho-total">
+          <label for="u-desc">Descripción</label>
+          <textarea id="u-desc" name="descripcion" class="entrada" [(ngModel)]="form.descripcion"></textarea>
+        </div>
+      </div>
+    } @else if (modal() === 'rol') {
+      <div class="campo">
+        <label for="r-rol">Nuevo rol</label>
+        <select id="r-rol" name="id_rol" class="entrada" [(ngModel)]="form.id_rol">
+          @for (rol of roles; track rol.id_rol) {
+            <option [ngValue]="rol.id_rol">{{ rol.nombre }}</option>
+          }
+        </select>
+        <span class="ayuda">La persona tendrá que iniciar sesión de nuevo para ver su nuevo menú.</span>
+      </div>
+    } @else if (modal() === 'clave') {
+      <div class="campo">
+        <label for="c-nueva">Nueva contraseña</label>
+        <input id="c-nueva" name="password_nueva" class="entrada" type="password" [(ngModel)]="form.password_nueva" placeholder="Mínimo 8 caracteres" />
+      </div>
+      <div class="campo">
+        <label for="c-conf">Confirmar contraseña</label>
+        <input id="c-conf" name="confirmar" class="entrada" type="password" [(ngModel)]="form.confirmar" />
+      </div>
+    }
+    @if (errorForm()) {
+      <p class="error-campo"><span class="material-symbols-rounded">error</span>{{ errorForm() }}</p>
+    }
+  </form>
+  <ng-container ngProjectAs="[pie]">
+    <button class="boton boton-claro" type="button" (click)="abiertoModal.set(false)">Cancelar</button>
+    <button class="boton boton-primario" type="submit" form="form-usuario" [disabled]="guardando()">
+      <span class="material-symbols-rounded">save</span>
+      {{ guardando() ? 'Guardando...' : 'Guardar' }}
+    </button>
+  </ng-container>
+</app-modal>
+
+<app-confirmar [(abierto)]="confirmarAbierto" titulo="Desactivar cuenta" [texto]="textoDesactivar()" textoBoton="Desactivar" [alConfirmar]="desactivar" />
