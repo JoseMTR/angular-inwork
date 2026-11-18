@@ -1,0 +1,108 @@
+<div class="pagina">
+  <app-page-header titulo="Chat del equipo" grupo="General" descripcion="Habla en tiempo real con los administradores, moderadores y analistas que estén conectados.">
+    <span class="estado" [class]="'estado estado-' + chat.estado()">
+      <i></i>
+      {{ textoEstado() }}
+    </span>
+    @if (chat.estado() === 'desconectado') {
+      <button class="boton boton-primario boton-pequeno" type="button" (click)="chat.conectar()">
+        <span class="material-symbols-rounded">login</span>
+        Entrar al chat
+      </button>
+    } @else {
+      <button class="boton boton-claro boton-pequeno" type="button" (click)="chat.desconectar()">
+        <span class="material-symbols-rounded">logout</span>
+        Salir del chat
+      </button>
+    }
+  </app-page-header>
+
+  @if (chat.error()) {
+    <div class="alerta">
+      <span class="material-symbols-rounded">error</span>
+      {{ chat.error() }}
+    </div>
+  }
+
+  <div class="espacio">
+    <section class="conversacion vidrio">
+      <header class="cabecera">
+        <span class="icono-sala">
+          <span class="material-symbols-rounded">forum</span>
+        </span>
+        <div>
+          <h2>Sala del equipo InWork</h2>
+          <span class="texto-3 texto-chico">Cada mensaje les llega al instante a todos los conectados</span>
+        </div>
+      </header>
+
+      <div class="mensajes" #caja>
+        @for (item of chat.items(); track item.clave) {
+          @if (item.tipo === 'aviso') {
+            <div class="aviso">
+              <span>{{ item.texto }}</span>
+              <small>{{ f.horaDe(item.created) }}</small>
+            </div>
+          } @else {
+            <app-chat-bubble [autor]="item.mensaje!.nombre + ' · ' + item.mensaje!.rol" [hora]="f.fechaHora(item.created)" [propio]="item.mensaje!.id_remitente === miId()">
+              {{ item.texto }}
+            </app-chat-bubble>
+          }
+        } @empty {
+          @if (chat.estado() === 'conectando') {
+            <p class="texto-3 centrado">Conectando con el chat...</p>
+          } @else {
+            <app-empty-state icono="chat" titulo="Todavía no hay mensajes" texto="Escribe el primero: les llegará al instante a todos los conectados." />
+          }
+        }
+      </div>
+
+      <form class="formulario" (ngSubmit)="enviar()">
+        <textarea
+          class="entrada"
+          name="texto"
+          rows="2"
+          maxlength="1000"
+          [placeholder]="chat.estado() === 'conectado' ? 'Escribe un mensaje para el equipo...' : 'Entra al chat para escribir'"
+          [ngModel]="texto()"
+          (ngModelChange)="texto.set($event)"
+          (keydown.enter)="enterParaEnviar($event)"
+          [disabled]="chat.estado() !== 'conectado'"
+        ></textarea>
+        <button class="boton boton-primario" type="submit" [disabled]="!puedeEnviar()">
+          <span class="material-symbols-rounded">send</span>
+          Enviar
+        </button>
+      </form>
+      <small class="pista">{{ texto().length }}/{{ maximo }} · Enter para enviar, Shift + Enter para una nueva línea</small>
+    </section>
+
+    <aside class="lista-conectados vidrio">
+      <h3>
+        Conectados
+        <span class="numero">{{ chat.conectados().length }}</span>
+      </h3>
+      <ul>
+        @for (usuario of chat.conectados(); track usuario.id_usuario) {
+          <li>
+            <span class="con-punto">
+              <app-avatar [nombre]="usuario.nombre" />
+              <i class="punto"></i>
+            </span>
+            <span class="persona">
+              <strong>
+                {{ usuario.nombre }}
+                @if (usuario.id_usuario === miId()) {
+                  <em>(tú)</em>
+                }
+              </strong>
+              <small>{{ usuario.rol }}</small>
+            </span>
+          </li>
+        } @empty {
+          <li class="texto-3 texto-chico">{{ chat.estado() === 'conectado' ? 'Nadie más está conectado.' : 'Entra al chat para ver quién está conectado.' }}</li>
+        }
+      </ul>
+    </aside>
+  </div>
+</div>

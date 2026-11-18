@@ -22,6 +22,13 @@ export const routes: Routes = [
         loadComponent: () => import('./features/dashboard/page/dashboard-page/dashboard-page').then((m) => m.DashboardPage)
       },
       {
+        // Chat en tiempo real (WebSocket) entre Administrador, Moderador y Analista.
+        // No va en la tabla modulos: es de todo el equipo del panel, como Inicio y Mi perfil.
+        path: 'chat-equipo',
+        title: 'Chat del equipo | InWork',
+        loadComponent: () => import('./features/chat-equipo/page/chat-equipo-page/chat-equipo-page').then((m) => m.ChatEquipoPage)
+      },
+      {
         path: 'usuarios',
         title: 'Usuarios | InWork',
         canActivate: [permisoGuard],

@@ -61,6 +61,8 @@ export function infoModulo(modulo: any): ItemMenu {
 export function construirMenu(modulos: any[] = []): GrupoMenu[] {
   const grupos: GrupoMenu[] = GRUPOS.map((g) => ({ ...g, items: [] as ItemMenu[] }));
   grupos[0].items.push({ texto: 'Inicio', icono: 'space_dashboard', ruta: '/inicio', nombre: 'inicio' });
+  // El chat del equipo es para todos los roles del panel (no depende de rol_modulo)
+  grupos[0].items.push({ texto: 'Chat del equipo', icono: 'chat', ruta: '/chat-equipo', nombre: 'chat-equipo' });
 
   for (const modulo of modulos) {
     if (!modulo.puede_leer) continue;

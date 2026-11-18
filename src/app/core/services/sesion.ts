@@ -130,9 +130,9 @@ export class SesionService {
     return !!fila && !!fila['puede_' + accion];
   }
 
-  // Inicio, Perfil y Sin permiso son de todos; lo demás debe estar en rol_modulo con permiso de leer
+  // Inicio, Chat del equipo, Perfil y Sin permiso son de todos; lo demás debe estar en rol_modulo con permiso de leer
   puedeAbrir(ruta: string): boolean {
-    if (['/inicio', '/perfil', '/sin-permiso'].includes(ruta)) return true;
+    if (['/inicio', '/chat-equipo', '/perfil', '/sin-permiso'].includes(ruta)) return true;
     if (this._sesion()?.id_rol === 1) return true;
     const modulo = this._modulos().find((m) => ruta === m.ruta || ruta.startsWith(m.ruta + '/'));
     return !!modulo && modulo.puede_leer;
